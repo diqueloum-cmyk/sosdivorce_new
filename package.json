@@ -1,6 +1,7 @@
 {
   "name": "sosdivorce-site",
   "version": "1.0.0",
+  "type": "module",
   "description": "Site web sosdivorce.fr avec chatbot IA et système d'inscription",
   "main": "index.html",
   "scripts": {
