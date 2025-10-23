@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration - sosdivorce.fr</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'system-ui', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Modal de connexion admin -->
+  <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+      <h2 class="text-2xl font-bold text-blue-900 mb-6">Authentification Admin</h2>
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Clé Admin</label>
+          <input
+            type="password"
+            id="adminKeyInput"
+            required
+            placeholder="Entrez votre clé admin"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div id="loginError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"></div>
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          Se connecter
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contenu admin (caché par défaut) -->
+  <div id="adminContent" class="hidden">
+    <div class="container mx-auto px-4 py-8">
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold text-blue-900">Administration - sosdivorce.fr</h1>
+          <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+            Déconnexion
+          </button>
+        </div>
+      
+      <!-- Statistiques -->
+      <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-blue-50 p-4 rounded-lg">
+          <h3 class="text-lg font-semibold text-blue-900">Total Utilisateurs</h3>
+          <p id="totalUsers" class="text-2xl font-bold text-blue-600">-</p>
+        </div>
+        <div class="bg-green-50 p-4 rounded-lg">
+          <h3 class="text-lg font-semibold text-green-900">Inscriptions Aujourd'hui</h3>
+          <p id="todayUsers" class="text-2xl font-bold text-green-600">-</p>
+        </div>
+        <div class="bg-purple-50 p-4 rounded-lg">
+          <h3 class="text-lg font-semibold text-purple-900">Dernier Utilisateur</h3>
+          <p id="lastUser" class="text-sm text-purple-600">-</p>
+        </div>
+      </div>
+
+      <!-- Bouton de rafraîchissement -->
+      <div class="mb-6">
+        <button onclick="loadStats()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Actualiser les données
+        </button>
+        <button onclick="loadUsers()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 ml-2">
+          Voir tous les utilisateurs
+        </button>
+      </div>
+
+      <!-- Liste des utilisateurs -->
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Utilisateurs Inscrits</h2>
+        <div id="usersList" class="space-y-2">
+          <p class="text-gray-500">Cliquez sur "Voir tous les utilisateurs" pour charger la liste</p>
+        </div>
+      </div>
+
+      <!-- Messages d'erreur -->
+      <div id="errorMessage" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let adminKey = null;
+
+    // Vérifier si déjà connecté au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedKey = sessionStorage.getItem('adminKey');
+      if (savedKey) {
+        // Vérifier si la clé est toujours valide
+        adminKey = savedKey;
+        testAdminKey(savedKey);
+      }
+    });
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      const testKey = document.getElementById('adminKeyInput').value;
+
+      try {
+        // Tester la clé admin en appelant les stats
+        const response = await fetch('/api/signup.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': testKey
+          },
+          body: JSON.stringify({ action: 'stats', adminKey: testKey })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          adminKey = testKey;
+          sessionStorage.setItem('adminKey', testKey);
+          showAdminContent();
+          loadStats();
+        } else {
+          throw new Error('Clé admin invalide');
+        }
+      } catch (error) {
+        const errorDiv = document.getElementById('loginError');
+        errorDiv.textContent = 'Clé admin invalide. Veuillez réessayer.';
+        errorDiv.classList.remove('hidden');
+      }
+    }
+
+    async function testAdminKey(key) {
+      try {
+        const response = await fetch('/api/signup.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': key
+          },
+          body: JSON.stringify({ action: 'stats', adminKey: key })
+        });
+
+        if (response.ok) {
+          showAdminContent();
+          loadStats();
+        } else {
+          // Clé invalide, afficher le modal
+          sessionStorage.removeItem('adminKey');
+          adminKey = null;
+        }
+      } catch (error) {
+        sessionStorage.removeItem('adminKey');
+        adminKey = null;
+      }
+    }
+
+    function showAdminContent() {
+      document.getElementById('authModal').classList.add('hidden');
+      document.getElementById('adminContent').classList.remove('hidden');
+    }
+
+    function logout() {
+      adminKey = null;
+      sessionStorage.removeItem('adminKey');
+      document.getElementById('authModal').classList.remove('hidden');
+      document.getElementById('adminContent').classList.add('hidden');
+      document.getElementById('adminKeyInput').value = '';
+    }
+
+    async function loadStats() {
+      if (!adminKey) return;
+
+      try {
+        const response = await fetch('/api/signup.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({ action: 'stats', adminKey: adminKey })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 403) {
+          // Session expirée, demander reconnexion
+          logout();
+          throw new Error('Session expirée. Veuillez vous reconnecter.');
+        }
+
+        if (data.success) {
+          document.getElementById('totalUsers').textContent = data.stats.totalUsers;
+          document.getElementById('todayUsers').textContent = data.stats.todayUsers;
+
+          if (data.stats.lastUser) {
+            document.getElementById('lastUser').textContent =
+              `${data.stats.lastUser.firstName} ${data.stats.lastUser.lastName} (${data.stats.lastUser.email})`;
+          } else {
+            document.getElementById('lastUser').textContent = 'Aucun utilisateur';
+          }
+        } else {
+          throw new Error(data.error || 'Erreur lors du chargement des statistiques');
+        }
+      } catch (error) {
+        showError('Erreur: ' + error.message);
+      }
+    }
+
+    async function loadUsers() {
+      if (!adminKey) return;
+
+      try {
+        const response = await fetch('/api/signup.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({ action: 'list', adminKey: adminKey })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 403) {
+          // Session expirée, demander reconnexion
+          logout();
+          throw new Error('Session expirée. Veuillez vous reconnecter.');
+        }
+
+        if (data.success) {
+          displayUsers(data.users);
+        } else {
+          throw new Error(data.error || 'Erreur lors du chargement des utilisateurs');
+        }
+      } catch (error) {
+        showError('Erreur: ' + error.message);
+      }
+    }
+
+    function displayUsers(users) {
+      const usersList = document.getElementById('usersList');
+
+      // Vider la liste
+      usersList.innerHTML = '';
+
+      if (users.length === 0) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'text-gray-500';
+        emptyMsg.textContent = 'Aucun utilisateur inscrit';
+        usersList.appendChild(emptyMsg);
+        return;
+      }
+
+      // Créer les éléments DOM de manière sûre (sans innerHTML)
+      users.forEach(user => {
+        const userDiv = document.createElement('div');
+        userDiv.className = 'bg-gray-50 p-4 rounded-lg border';
+
+        const flexDiv = document.createElement('div');
+        flexDiv.className = 'flex justify-between items-start';
+
+        const infoDiv = document.createElement('div');
+
+        const nameH4 = document.createElement('h4');
+        nameH4.className = 'font-semibold text-gray-800';
+        nameH4.textContent = `${user.firstName} ${user.lastName}`;
+
+        const emailP = document.createElement('p');
+        emailP.className = 'text-gray-600';
+        emailP.textContent = user.email;
+
+        const dateP = document.createElement('p');
+        dateP.className = 'text-sm text-gray-500';
+        dateP.textContent = `Inscrit le: ${new Date(user.registeredAt).toLocaleDateString('fr-FR')}`;
+
+        const idDiv = document.createElement('div');
+        idDiv.className = 'text-sm text-gray-500';
+        idDiv.textContent = `ID: ${user.id}`;
+
+        infoDiv.appendChild(nameH4);
+        infoDiv.appendChild(emailP);
+        infoDiv.appendChild(dateP);
+
+        flexDiv.appendChild(infoDiv);
+        flexDiv.appendChild(idDiv);
+
+        userDiv.appendChild(flexDiv);
+        usersList.appendChild(userDiv);
+      });
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.classList.remove('hidden');
+      
+      setTimeout(() => {
+        errorDiv.classList.add('hidden');
+      }, 5000);
+    }
+  </script>
+</body>
+</html>

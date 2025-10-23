@@ -1,0 +1,9 @@
+0000000000000000000000000000000000000000 68f022665d06ee90cdd9f6267749b6194abac5ce Franck ROSSET <franckrosset@MacBook-Air-de-Frank.local> 1759411747 +0200	commit (initial): Initial commit
+68f022665d06ee90cdd9f6267749b6194abac5ce 68f022665d06ee90cdd9f6267749b6194abac5ce Franck ROSSET <franckrosset@MacBook-Air-de-Frank.local> 1759411747 +0200	Branch: renamed refs/heads/main to refs/heads/main
+68f022665d06ee90cdd9f6267749b6194abac5ce 00c88b5714716a3bd369e7d14cd038aa398c14c6 Franck ROSSET <franckrosset@MacBook-Air-de-Frank.local> 1759413551 +0200	commit: Redeploy with OpenAI key
+00c88b5714716a3bd369e7d14cd038aa398c14c6 9ddd08229fde13ec74aca498eac9161ee5cd33cc Franck ROSSET <franckrosset@MacBook-Air-de-Frank.local> 1759415605 +0200	commit: Trigger redeploy
+9ddd08229fde13ec74aca498eac9161ee5cd33cc ad7a7af9d54026fa9b7fb2b555c7ae1f20d32c52 Franck ROSSET <franckrosset@MacBook-Air-de-Frank.local> 1759486662 +0200	commit: chore: move static files to public/
+ad7a7af9d54026fa9b7fb2b555c7ae1f20d32c52 f761e1c629e34b676b4aa80755f7f8f2939cfa7a Franck ROSSET <franckrosset@MacBook-Air-de-Frank.local> 1759843640 +0200	commit: Ajout base de données simple et page d'administration
+f761e1c629e34b676b4aa80755f7f8f2939cfa7a da836ecf870dd93b15c7c2ff1a686cea8a3cd6b8 Franck ROSSET <franckrosset@MacBook-Air-de-Frank.local> 1759843658 +0200	commit (amend): Ajout base de données simple et page d'administration
+da836ecf870dd93b15c7c2ff1a686cea8a3cd6b8 6a9379c1a213c5761384ba9c38f4e341f798034c Franck ROSSET <franckrosset@MacBook-Air-de-Frank.local> 1760000887 +0200	commit: Intégration formulaire Tally pour Google Sheets
+6a9379c1a213c5761384ba9c38f4e341f798034c 2c3797de6b5e8f4f1cb854d8007b15c624199905 Franck ROSSET <franckrosset@MacBook-Air-de-Frank.local> 1760002820 +0200	commit: Ajout formulaire Tally en bas de page (sans modifier le reste)
