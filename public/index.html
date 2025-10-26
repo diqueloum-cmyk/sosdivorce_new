@@ -501,6 +501,9 @@
       document.getElementById('loginBtn').classList.add('hidden');
       document.getElementById('userName').textContent = user.firstName || user.email;
 
+      // Masquer le compteur de questions gratuites
+      updateQuestionCounter();
+
       // Afficher la sidebar et charger l'historique
       showConversationSidebar();
       loadConversationHistory();
@@ -525,17 +528,29 @@
 
     // Mettre à jour le compteur de questions
     function updateQuestionCounter() {
-      // Lire le cookie q_used pour synchroniser avec le serveur
-      if (!currentUser) {
+      const counterElement = document.getElementById('questionCounter');
+
+      // Si l'utilisateur est connecté, masquer le compteur
+      if (currentUser) {
+        if (counterElement) {
+          counterElement.style.display = 'none';
+        }
+        return;
+      }
+
+      // Sinon, afficher et mettre à jour le compteur
+      if (counterElement) {
+        counterElement.style.display = 'block';
+
+        // Lire le cookie q_used pour synchroniser avec le serveur
         const qUsedCookie = getCookie('q_used');
         if (qUsedCookie) {
           questionsUsed = parseInt(qUsedCookie) || 0;
         }
-      }
 
-      const remaining = maxFreeQuestions - questionsUsed;
-      document.getElementById('questionCounter').textContent =
-        `Questions gratuites restantes : ${remaining}`;
+        const remaining = maxFreeQuestions - questionsUsed;
+        counterElement.textContent = `Questions gratuites restantes : ${remaining}`;
+      }
     }
 
     // Afficher le modal d'authentification
