@@ -686,8 +686,24 @@
           credentials: 'include',
           body: JSON.stringify({ action: 'logout' })
         });
-        
+
         currentUser = null;
+        currentSessionId = null;
+        conversationSessions = [];
+
+        // Vider la chatbox
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.innerHTML = `
+          <div class="text-center text-gray-500">
+            <p>Posez votre question juridique ci-dessous...</p>
+            <p class="text-sm mt-2" id="questionCounter">Questions gratuites restantes : 2</p>
+          </div>
+        `;
+
+        // Réinitialiser le compteur de questions
+        questionsUsed = 0;
+        updateQuestionCounter();
+
         hideUserStatus();
         showMessage('Déconnexion réussie', 'success');
       } catch (error) {
