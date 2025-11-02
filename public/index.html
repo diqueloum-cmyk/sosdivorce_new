@@ -800,11 +800,20 @@
       }
     }
 
+    // Variable pour empêcher les doubles soumissions
+    let isProcessing = false;
+
     // Fonction principale pour poser une question
     async function askGPT() {
+      // Empêcher les doubles soumissions
+      if (isProcessing) {
+        console.log('Already processing a request, ignoring...');
+        return;
+      }
+
       const userInput = document.getElementById('userInput');
       const question = userInput.value.trim();
-      
+
       if (!question) {
         alert('Veuillez saisir une question.');
         return;
@@ -816,6 +825,9 @@
         return;
       }
 
+      // Marquer comme en cours de traitement
+      isProcessing = true;
+
       // Afficher la question de l'utilisateur
       addMessage(question, 'user');
       userInput.value = '';
@@ -823,7 +835,7 @@
       // Afficher l'indicateur de chargement
       const loadingId = addMessage('Réflexion en cours...', 'assistant', true);
       console.log('Created loading message with ID:', loadingId);
-      
+
       // Désactiver le bouton
       const sendBtn = document.getElementById('sendBtn');
       const loadingBtn = document.getElementById('loadingBtn');
@@ -920,6 +932,8 @@
         // Réactiver le bouton
         sendBtn.classList.remove('hidden');
         loadingBtn.classList.add('hidden');
+        // Réinitialiser le flag de traitement
+        isProcessing = false;
       }
     }
 
