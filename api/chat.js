@@ -173,7 +173,7 @@ export default async function handler(req, res) {
         // Étape 4: Attendre que l'exécution soit terminée (polling)
         let runStatus = 'queued';
         let attempts = 0;
-        const maxAttempts = 30; // 30 secondes maximum
+        const maxAttempts = 60; // 60 secondes maximum (augmenté pour les assistants)
 
         while (runStatus !== 'completed' && attempts < maxAttempts) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde
@@ -193,8 +193,10 @@ export default async function handler(req, res) {
           const statusData = await statusResponse.json();
           runStatus = statusData.status;
 
+          logger.debug(`Assistant run status (attempt ${attempts}):`, runStatus);
+
           if (runStatus === 'failed' || runStatus === 'cancelled' || runStatus === 'expired') {
-            logger.error('Assistant run failed with status:', runStatus);
+            logger.error('Assistant run failed with status:', runStatus, 'Details:', statusData);
             throw new Error('L\'assistant n\'a pas pu traiter la demande');
           }
 
@@ -202,6 +204,7 @@ export default async function handler(req, res) {
         }
 
         if (runStatus !== 'completed') {
+          logger.error('Assistant timeout after', attempts, 'attempts. Last status:', runStatus);
           throw new Error('Timeout: L\'assistant met trop de temps à répondre');
         }
 
