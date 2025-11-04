@@ -87,7 +87,7 @@
 
   <!-- Hero -->
   <main>
-  <section class="bg-blue-50 py-16 px-4">
+  <section id="heroSection" class="bg-blue-50 py-16 px-4">
     <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-stretch gap-8">
       <div class="md:w-1/2">
         <img src="logo-sosdivorce.png" alt="sosdivorce.fr - Conseil juridique divorce en ligne" class="w-full h-full min-h-80 object-cover rounded-lg shadow-lg">
@@ -497,6 +497,15 @@
       // Afficher la sidebar et charger l'historique
       showConversationSidebar();
       loadConversationHistory();
+
+      // Masquer toutes les sections sauf le chatbot et les tarifs
+      const sectionsToHide = ['heroSection', 'about', 'features', 'testimonials', 'faq', 'contact'];
+      sectionsToHide.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.style.display = 'none';
+        }
+      });
     }
 
     // Masquer le statut utilisateur
@@ -506,6 +515,15 @@
 
       // Masquer la sidebar
       hideConversationSidebar();
+
+      // Réafficher toutes les sections
+      const sectionsToShow = ['heroSection', 'about', 'features', 'testimonials', 'faq', 'contact'];
+      sectionsToShow.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.style.display = 'block';
+        }
+      });
     }
 
     // Lire les cookies (helper function)
