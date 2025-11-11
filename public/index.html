@@ -115,7 +115,7 @@
   <!-- Chatbot Section with History Sidebar -->
   <section class="py-16 px-4 bg-white">
     <div class="max-w-7xl mx-auto">
-      <h2 class="text-3xl font-bold text-center text-blue-900 mb-8">Conseil Juridique IA Spécialisé</h2>
+      <h2 class="text-3xl font-bold text-center text-blue-900 mb-8">Conseil juridique IA spécialisé (OK on garde)</h2>
 
       <!-- Overlay for mobile sidebar -->
       <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -166,7 +166,7 @@
             <div id="chatContainer" class="space-y-4 mb-4" style="max-height: 400px; overflow-y: auto;">
               <div class="text-center text-gray-500">
                 <p>Posez votre question juridique ci-dessous...</p>
-                <p class="text-sm mt-2" id="questionCounter">Questions gratuites restantes : 2</p>
+                <p class="text-sm mt-2" id="questionCounter">2 questions offertes. Créez un compte gratuit pour continuer ensuite, toujours gratuitement.</p>
               </div>
             </div>
             <div class="flex space-x-2">
@@ -550,10 +550,11 @@
     function updateQuestionCounter() {
       const counterElement = document.getElementById('questionCounter');
 
-      // Si l'utilisateur est connecté, masquer le compteur
+      // Si l'utilisateur est connecté, afficher le texte spécifique
       if (currentUser) {
         if (counterElement) {
-          counterElement.style.display = 'none';
+          counterElement.style.display = 'block';
+          counterElement.innerHTML = 'Micro-ligne explicative<br>Inscription en 20 secondes. Historique et mémo de vos échanges sauvegardés.';
         }
         return;
       }
@@ -569,7 +570,13 @@
         }
 
         const remaining = maxFreeQuestions - questionsUsed;
-        counterElement.textContent = `Questions gratuites restantes : ${remaining}`;
+        if (remaining === 2) {
+          counterElement.textContent = '2 questions offertes. Créez un compte gratuit pour continuer ensuite, toujours gratuitement.';
+        } else if (remaining === 1) {
+          counterElement.textContent = '1 question offerte restante. Créez un compte gratuit pour continuer ensuite, toujours gratuitement.';
+        } else {
+          counterElement.textContent = 'Créez un compte gratuit pour continuer, toujours gratuitement.';
+        }
       }
     }
 
@@ -743,7 +750,7 @@
         chatContainer.innerHTML = `
           <div class="text-center text-gray-500">
             <p>Posez votre question juridique ci-dessous...</p>
-            <p class="text-sm mt-2" id="questionCounter">Questions gratuites restantes : 2</p>
+            <p class="text-sm mt-2" id="questionCounter">2 questions offertes. Créez un compte gratuit pour continuer ensuite, toujours gratuitement.</p>
           </div>
         `;
 
