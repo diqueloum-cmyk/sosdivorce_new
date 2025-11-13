@@ -558,21 +558,16 @@
       const consent = localStorage.getItem('cookieConsent');
       console.log('Cookie consent check:', consent); // Debug
       if (!consent) {
-        // Afficher le bandeau immédiatement avec style inline et !important
+        // Afficher le bandeau immédiatement
         const banner = document.getElementById('cookieBanner');
         console.log('Cookie banner element:', banner); // Debug
         if (banner) {
-          banner.style.setProperty('display', 'block', 'important');
-          banner.style.setProperty('position', 'fixed', 'important');
-          banner.style.setProperty('bottom', '0', 'important');
-          banner.style.setProperty('left', '0', 'important');
-          banner.style.setProperty('right', '0', 'important');
-          banner.style.setProperty('width', '100%', 'important');
-          banner.style.setProperty('background-color', 'white', 'important');
-          banner.style.setProperty('box-shadow', '0 -4px 20px rgba(0, 0, 0, 0.15)', 'important');
-          banner.style.setProperty('border-top', '3px solid #2563eb', 'important');
-          banner.style.setProperty('z-index', '99999', 'important');
-          console.log('Cookie banner should be visible now with inline styles + !important'); // Debug
+          // Supprimer toutes les classes qui pourraient interférer
+          banner.className = '';
+          // Appliquer les styles directement via setAttribute pour contourner tout CSS
+          banner.setAttribute('style', 'display: block !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; background-color: white !important; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important; border-top: 3px solid #2563eb !important; z-index: 99999 !important; padding: 1rem !important;');
+          console.log('Cookie banner style attribute set'); // Debug
+          console.log('Banner final style:', banner.getAttribute('style'));
         }
       } else {
         // Charger les cookies selon le consentement
