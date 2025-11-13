@@ -558,21 +558,21 @@
       const consent = localStorage.getItem('cookieConsent');
       console.log('Cookie consent check:', consent); // Debug
       if (!consent) {
-        // Afficher le bandeau immédiatement avec style inline
+        // Afficher le bandeau immédiatement avec style inline et !important
         const banner = document.getElementById('cookieBanner');
         console.log('Cookie banner element:', banner); // Debug
         if (banner) {
-          banner.style.display = 'block';
-          banner.style.position = 'fixed';
-          banner.style.bottom = '0';
-          banner.style.left = '0';
-          banner.style.right = '0';
-          banner.style.width = '100%';
-          banner.style.backgroundColor = 'white';
-          banner.style.boxShadow = '0 -4px 20px rgba(0, 0, 0, 0.15)';
-          banner.style.borderTop = '3px solid #2563eb';
-          banner.style.zIndex = '99999';
-          console.log('Cookie banner should be visible now with inline styles'); // Debug
+          banner.style.setProperty('display', 'block', 'important');
+          banner.style.setProperty('position', 'fixed', 'important');
+          banner.style.setProperty('bottom', '0', 'important');
+          banner.style.setProperty('left', '0', 'important');
+          banner.style.setProperty('right', '0', 'important');
+          banner.style.setProperty('width', '100%', 'important');
+          banner.style.setProperty('background-color', 'white', 'important');
+          banner.style.setProperty('box-shadow', '0 -4px 20px rgba(0, 0, 0, 0.15)', 'important');
+          banner.style.setProperty('border-top', '3px solid #2563eb', 'important');
+          banner.style.setProperty('z-index', '99999', 'important');
+          console.log('Cookie banner should be visible now with inline styles + !important'); // Debug
         }
       } else {
         // Charger les cookies selon le consentement
@@ -645,7 +645,7 @@
     function hideCookieBanner() {
       const banner = document.getElementById('cookieBanner');
       if (banner) {
-        banner.style.display = 'none';
+        banner.style.setProperty('display', 'none', 'important');
       }
     }
 
