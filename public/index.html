@@ -533,12 +533,9 @@
     // Vérifier et afficher le bandeau cookies au chargement
     function checkCookieConsent() {
       const consent = localStorage.getItem('cookieConsent');
-      console.log('Cookie consent check:', consent); // Debug
       if (!consent) {
-        // Créer le bandeau dynamiquement
         createCookieBanner();
       } else {
-        // Charger les cookies selon le consentement
         const preferences = JSON.parse(consent);
         loadCookies(preferences);
       }
@@ -575,7 +572,6 @@
       `;
 
       document.body.appendChild(banner);
-      console.log('Cookie banner created dynamically');
     }
 
     // Accepter tous les cookies
@@ -662,38 +658,19 @@
 
     // Charger les cookies selon les préférences
     function loadCookies(preferences) {
-      // Ici vous pouvez ajouter le code pour charger Google Analytics, Google Ads, Meta Pixel, etc.
       if (preferences.statistics) {
-        // Charger Google Analytics
-        console.log('Google Analytics activé');
-        // TODO: Ajouter le script Google Analytics
+        // Charger Google Analytics ici si besoin
       }
       if (preferences.advertising) {
-        // Charger Google Ads et Meta Pixel
-        console.log('Cookies publicitaires activés');
-        // TODO: Ajouter les scripts Google Ads et Meta Pixel
+        // Charger Google Ads et Meta Pixel ici si besoin
       }
     }
 
     // Vérifier le statut utilisateur au chargement
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('DOM Content Loaded'); // Debug
       checkUserStatus();
       updateQuestionCounter();
       checkCookieConsent();
-
-      // TEST: Forcer l'affichage du bandeau après 2 secondes
-      setTimeout(() => {
-        const banner = document.getElementById('cookieBanner');
-        console.log('Force show banner test, element:', banner);
-        if (banner) {
-          console.log('Banner computed style:', window.getComputedStyle(banner).display);
-          console.log('Banner classes:', banner.className);
-          banner.classList.add('show');
-          console.log('Banner classes after add:', banner.className);
-          console.log('Banner computed style after:', window.getComputedStyle(banner).display);
-        }
-      }, 2000);
     });
 
     // Vérifier le statut de l'utilisateur

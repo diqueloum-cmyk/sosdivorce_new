@@ -136,7 +136,6 @@ async function handleRegister(firstName, lastName, email, password, req, res) {
 
   // Envoyer vers Google Sheets via webhook
   try {
-    const SHEET_ID = '1cfJApHpVD1bIbb9IWrePIIO1j0YhjNjBmOLB7S8Mhzk';
     const webhookUrl = process.env.GOOGLE_WEBHOOK_URL;
 
     if (webhookUrl) {
