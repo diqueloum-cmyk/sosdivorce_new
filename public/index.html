@@ -8,6 +8,8 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: 'Poppins', sans-serif; }
     .typing-cursor { animation: blink 1s infinite; }
@@ -1178,6 +1180,11 @@
               <p class="text-xs text-gray-400">${formatDate(session.lastMessageAt)}</p>
             </div>
             <div class="session-actions ml-2 flex space-x-1">
+              <button onclick="event.stopPropagation(); downloadSessionPDF(${session.id})"
+                      class="text-blue-500 hover:text-blue-700 p-1"
+                      title="Télécharger en PDF">
+                📥
+              </button>
               <button onclick="event.stopPropagation(); deleteSession(${session.id})"
                       class="text-red-500 hover:text-red-700 p-1"
                       title="Supprimer">
@@ -1271,6 +1278,135 @@
       } catch (error) {
         console.error('Erreur suppression session:', error);
         alert('Erreur lors de la suppression');
+      }
+    }
+
+    // Télécharger une session en PDF
+    async function downloadSessionPDF(sessionId) {
+      try {
+        // Récupérer les messages de la session
+        const response = await fetch(`/api/conversations?sessionId=${sessionId}`, {
+          credentials: 'include'
+        });
+
+        const data = await response.json();
+
+        if (!data.success || !data.messages || data.messages.length === 0) {
+          alert('Aucun message à télécharger');
+          return;
+        }
+
+        // Trouver le titre de la session
+        const session = conversationSessions.find(s => s.id === sessionId);
+        const sessionTitle = session ? session.title : 'Conversation';
+        const sessionDate = session ? new Date(session.createdAt).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR');
+
+        // Créer le PDF avec jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Configuration
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 20;
+        const maxWidth = pageWidth - (margin * 2);
+        let yPosition = margin;
+
+        // En-tête du document
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.text('sosdivorce.fr', margin, yPosition);
+        yPosition += 10;
+
+        doc.setFontSize(14);
+        doc.text(sessionTitle, margin, yPosition);
+        yPosition += 8;
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text('Date : ' + sessionDate, margin, yPosition);
+        yPosition += 5;
+        doc.text(`${data.messages.length} messages`, margin, yPosition);
+        yPosition += 15;
+
+        // Ligne de séparation
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, yPosition, pageWidth - margin, yPosition);
+        yPosition += 10;
+
+        // Parcourir les messages
+        doc.setTextColor(0, 0, 0);
+
+        for (let i = 0; i < data.messages.length; i++) {
+          const msg = data.messages[i];
+          const isUser = msg.role === 'user';
+
+          // Vérifier si on doit ajouter une nouvelle page
+          if (yPosition > pageHeight - 40) {
+            doc.addPage();
+            yPosition = margin;
+          }
+
+          // Label (Vous ou Assistant)
+          doc.setFontSize(11);
+          doc.setFont(undefined, 'bold');
+          if (isUser) {
+            doc.setTextColor(37, 99, 235); // Bleu
+            doc.text('Vous :', margin, yPosition);
+          } else {
+            doc.setTextColor(107, 114, 128); // Gris
+            doc.text('Assistant IA :', margin, yPosition);
+          }
+          yPosition += 6;
+
+          // Message
+          doc.setFont(undefined, 'normal');
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(10);
+
+          const lines = doc.splitTextToSize(msg.content, maxWidth);
+
+          // Vérifier si le message tient sur la page
+          if (yPosition + (lines.length * 5) > pageHeight - 20) {
+            doc.addPage();
+            yPosition = margin;
+          }
+
+          doc.text(lines, margin, yPosition);
+          yPosition += lines.length * 5 + 8;
+
+          // Ligne de séparation entre messages
+          if (i < data.messages.length - 1) {
+            doc.setDrawColor(240, 240, 240);
+            doc.line(margin, yPosition, pageWidth - margin, yPosition);
+            yPosition += 8;
+          }
+        }
+
+        // Footer sur toutes les pages
+        const totalPages = doc.internal.pages.length - 1;
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.setTextColor(150, 150, 150);
+          doc.text(
+            `Page ${i} sur ${totalPages} - sosdivorce.fr`,
+            pageWidth / 2,
+            pageHeight - 10,
+            { align: 'center' }
+          );
+        }
+
+        // Générer le nom du fichier
+        const fileName = `sosdivorce_${sessionTitle.replace(/[^a-z0-9]/gi, '_')}_${sessionDate.replace(/\//g, '-')}.pdf`;
+
+        // Télécharger le PDF
+        doc.save(fileName);
+
+      } catch (error) {
+        console.error('Erreur téléchargement PDF:', error);
+        alert('Erreur lors de la génération du PDF');
       }
     }
 
