@@ -131,6 +131,18 @@ export default async function handler(req, res) {
         const threadId = threadData.id;
 
         // Étape 2: Ajouter le message au thread
+        // Préfixer le message avec un rappel du format obligatoire
+        const formatReminder = `RAPPEL FORMAT OBLIGATOIRE : Tu DOIS suivre cette structure EXACTE pour ta réponse :
+## 1. Contexte / demande de l'utilisateur
+## 2. Hypothèses prises si des informations manquent
+## 3. Analyse juridique synthétique
+## 4. Options possibles
+## 5. Recommandation synthétique
+## 6. Points de vigilance
+## 7. Et maintenant ?
+
+Question de l'utilisateur :`;
+
         const messageResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
           method: 'POST',
           headers: {
@@ -140,7 +152,7 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             role: 'user',
-            content: message
+            content: `${formatReminder}\n${message}`
           })
         });
 
@@ -158,7 +170,9 @@ export default async function handler(req, res) {
             'OpenAI-Beta': 'assistants=v2'
           },
           body: JSON.stringify({
-            assistant_id: ASSISTANT_ID
+            assistant_id: ASSISTANT_ID,
+            temperature: 0,  // Force le modèle à être plus déterministe et strict
+            additional_instructions: "IMPORTANT : Respecte STRICTEMENT le format structuré en 7 sections pour CHAQUE réponse. Ne dévie JAMAIS de cette structure."
           })
         });
 
