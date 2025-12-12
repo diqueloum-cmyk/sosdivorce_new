@@ -132,14 +132,19 @@ export default async function handler(req, res) {
 
         // Étape 2: Ajouter le message au thread
         // Préfixer le message avec un rappel du format obligatoire
-        const formatReminder = `RAPPEL FORMAT OBLIGATOIRE : Tu DOIS suivre cette structure EXACTE pour ta réponse :
-## 1. Contexte / demande de l'utilisateur
-## 2. Hypothèses prises si des informations manquent
-## 3. Analyse juridique synthétique
-## 4. Options possibles
-## 5. Recommandation synthétique
-## 6. Points de vigilance
-## 7. Et maintenant ?
+        const formatReminder = `RAPPEL FORMAT OBLIGATOIRE : Tu DOIS suivre cette structure EXACTE pour ta réponse, mais SANS afficher les titres de sections.
+
+Ta réponse doit contenir ces 7 sections dans cet ordre, séparées par des sauts de ligne, MAIS tu ne dois PAS écrire les titres (pas de "## 1.", "## 2.", etc.) :
+
+1. Commence par reformuler le contexte et la demande de l'utilisateur
+2. Mentionne les hypothèses prises si des informations manquent
+3. Fournis une analyse juridique synthétique
+4. Présente les options possibles
+5. Donne une recommandation synthétique
+6. Indique les points de vigilance
+7. Termine par les prochaines étapes ("Et maintenant ?")
+
+Écris un texte fluide et naturel, sans titres visibles, mais en suivant strictement cet ordre logique.
 
 Question de l'utilisateur :`;
 
@@ -172,7 +177,7 @@ Question de l'utilisateur :`;
           body: JSON.stringify({
             assistant_id: ASSISTANT_ID,
             temperature: 0,  // Force le modèle à être plus déterministe et strict
-            additional_instructions: "IMPORTANT : Respecte STRICTEMENT le format structuré en 7 sections pour CHAQUE réponse. Ne dévie JAMAIS de cette structure."
+            additional_instructions: "IMPORTANT : Respecte STRICTEMENT le format structuré en 7 sections pour CHAQUE réponse, mais n'affiche PAS les titres de sections. Écris un texte fluide avec des paragraphes distincts pour chaque section. Ne dévie JAMAIS de cette structure logique."
           })
         });
 
