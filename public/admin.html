@@ -126,7 +126,6 @@
               </button>
               <button id="viewAnonymous" class="sub-tab-button px-4 py-2 bg-gray-300 text-gray-700 rounded">
                 Utilisateurs anonymes
-                <span id="anonymousCount" class="ml-2 bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs">0</span>
               </button>
             </div>
 
@@ -522,33 +521,6 @@
       switchView('User');  // Afficher la vue "Par utilisateur" par défaut
       await loadUserFilter();
       await loadUserConversations();
-      await loadAnonymousCount();  // Charger le compteur des conversations anonymes
-    }
-
-    /**
-     * Charger uniquement le compteur de conversations anonymes
-     */
-    async function loadAnonymousCount() {
-      if (!adminKey) return;
-
-      try {
-        const response = await fetch(
-          `/api/admin-conversations?action=listAnonymous&page=1&limit=1`,
-          {
-            headers: {
-              'X-Admin-Key': adminKey
-            }
-          }
-        );
-
-        const data = await response.json();
-
-        if (data.success && data.pagination) {
-          document.getElementById('anonymousCount').textContent = data.pagination.total;
-        }
-      } catch (error) {
-        console.error('Erreur chargement compteur anonymes:', error);
-      }
     }
 
     async function loadUserFilter() {
@@ -866,9 +838,6 @@
         if (data.success) {
           renderAnonymousConversations(data.conversations);
           renderAnonymousPagination(data.pagination);
-
-          // Mettre à jour le compteur
-          document.getElementById('anonymousCount').textContent = data.pagination.total;
         } else {
           showError('Erreur: ' + data.error);
         }
