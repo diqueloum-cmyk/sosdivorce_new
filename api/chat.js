@@ -4,6 +4,7 @@ import {
   saveCachedAnswer,
   findUserByEmail,
   createConversationSession,
+  createAnonymousConversationSession,
   addConversationMessage
 } from '../lib/db.js';
 import {
@@ -15,6 +16,7 @@ import {
   addRateLimitHeaders
 } from '../lib/ratelimit.js';
 import logger from '../lib/logger.js';
+import crypto from 'crypto';
 
 export default async function handler(req, res) {
   // Configurer CORS avec liste blanche
@@ -269,42 +271,69 @@ Question de l'utilisateur :`;
     const responseTimeMs = Date.now() - startTime;
 
     // ====================================
-    // SAUVEGARDER LA CONVERSATION (si utilisateur connecté)
+    // SAUVEGARDER LA CONVERSATION (pour TOUS les utilisateurs)
     // ====================================
     let conversationSessionId = sessionId;
 
-    if (currentUser) {
-      try {
-        // Si pas de sessionId, créer une nouvelle session
-        if (!conversationSessionId) {
-          conversationSessionId = await createConversationSession(currentUser.id, message);
-          logger.debug('Nouvelle session créée:', conversationSessionId);
-        }
+    // Gestion de l'identifiant anonyme pour utilisateurs non connectés
+    let anonymousId = null;
+    let needsAnonymousCookie = false;
 
-        // Sauvegarder la question de l'utilisateur
-        await addConversationMessage(conversationSessionId, 'user', message, {
-          tokensUsed: 0,
-          responseTimeMs: null,
-          wasCached: false
-        });
-
-        // Sauvegarder la réponse de l'assistant
-        await addConversationMessage(conversationSessionId, 'assistant', answer, {
-          tokensUsed,
-          responseTimeMs,
-          wasCached: fromCache
-        });
-
-        logger.info('Conversation sauvegardée:', {
-          userId: currentUser.id,
-          sessionId: conversationSessionId,
-          cached: fromCache
-        });
-
-      } catch (error) {
-        // Ne pas bloquer la réponse si la sauvegarde échoue
-        logger.error('Erreur sauvegarde conversation:', error);
+    if (!currentUser) {
+      // Récupérer ou générer l'identifiant anonyme
+      anonymousId = cookies.anonymous_session_id;
+      if (!anonymousId) {
+        anonymousId = crypto.randomUUID();
+        needsAnonymousCookie = true;
+        logger.debug('Nouvel identifiant anonyme généré:', anonymousId);
       }
+    }
+
+    // Sauvegarder pour utilisateurs enregistrés ET anonymes
+    try {
+      // Si pas de sessionId, créer une nouvelle session
+      if (!conversationSessionId) {
+        if (currentUser) {
+          // Session pour utilisateur enregistré
+          conversationSessionId = await createConversationSession(currentUser.id, message);
+          logger.debug('Nouvelle session enregistrée créée:', conversationSessionId);
+        } else {
+          // Session pour utilisateur anonyme
+          conversationSessionId = await createAnonymousConversationSession(
+            anonymousId,
+            clientIp, // Déjà récupéré ligne 60
+            req.headers['user-agent'] || 'Unknown',
+            message
+          );
+          logger.debug('Nouvelle session anonyme créée:', { sessionId: conversationSessionId, anonymousId });
+        }
+      }
+
+      // Sauvegarder la question de l'utilisateur
+      await addConversationMessage(conversationSessionId, 'user', message, {
+        tokensUsed: 0,
+        responseTimeMs: null,
+        wasCached: false
+      });
+
+      // Sauvegarder la réponse de l'assistant
+      await addConversationMessage(conversationSessionId, 'assistant', answer, {
+        tokensUsed,
+        responseTimeMs,
+        wasCached: fromCache
+      });
+
+      logger.info('Conversation sauvegardée:', {
+        userId: currentUser?.id || null,
+        anonymousId: anonymousId || null,
+        sessionId: conversationSessionId,
+        cached: fromCache,
+        isAnonymous: !currentUser
+      });
+
+    } catch (error) {
+      // Ne pas bloquer la réponse si la sauvegarde échoue
+      logger.error('Erreur sauvegarde conversation:', error);
     }
 
     // Incrémenter le compteur de questions si non inscrit
@@ -313,10 +342,18 @@ Question de l'utilisateur :`;
 
     // Définir les cookies
     if (!registered) {
-      const cookie = createCookie('q_used', newQUsed.toString(), {
-        maxAge: 24 * 60 * 60 // 24 heures
-      });
-      res.setHeader('Set-Cookie', cookie);
+      const cookies = [
+        createCookie('q_used', newQUsed.toString(), { maxAge: 24 * 60 * 60 })
+      ];
+
+      // Ajouter le cookie d'identifiant anonyme si nécessaire
+      if (needsAnonymousCookie) {
+        cookies.push(
+          createCookie('anonymous_session_id', anonymousId, { maxAge: 24 * 60 * 60 })
+        );
+      }
+
+      res.setHeader('Set-Cookie', cookies);
     }
 
     return res.status(200).json({
