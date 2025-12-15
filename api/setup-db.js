@@ -1,8 +1,14 @@
 // Endpoint pour initialiser la base de données
 // À exécuter UNE SEULE FOIS après avoir configuré Vercel Postgres
 // URL: https://votre-site.vercel.app/api/setup-db
+// Pour migration : https://votre-site.vercel.app/api/setup-db?action=migrate-anonymous
 
-import { createUsersTable, createCacheTable, createConversationTables } from '../lib/db.js';
+import {
+  createUsersTable,
+  createCacheTable,
+  createConversationTables,
+  migrateConversationTablesForAnonymous
+} from '../lib/db.js';
 import logger from '../lib/logger.js';
 
 export default async function handler(req, res) {
@@ -29,6 +35,47 @@ export default async function handler(req, res) {
     });
   }
 
+  // Vérifier si c'est une action de migration
+  const { action } = req.query;
+
+  if (action === 'migrate-anonymous') {
+    try {
+      logger.info('Exécution de la migration pour conversations anonymes...');
+      const result = await migrateConversationTablesForAnonymous();
+      logger.info('Migration terminée avec succès');
+
+      return res.status(200).json({
+        success: true,
+        action: 'migrate-anonymous',
+        message: 'Migration des conversations anonymes réussie',
+        details: result,
+        timestamp: new Date().toISOString(),
+        info: {
+          changes: [
+            'user_id peut maintenant être NULL',
+            'Colonne anonymous_identifier ajoutée (VARCHAR 255)',
+            'Colonne ip_address ajoutée (VARCHAR 45)',
+            'Colonne user_agent ajoutée (TEXT)',
+            'Colonne is_anonymous ajoutée (BOOLEAN)',
+            'Index idx_anonymous_sessions créé',
+            'Index idx_anonymous_identifier créé',
+            'Sessions existantes marquées comme non-anonymes'
+          ]
+        }
+      });
+    } catch (error) {
+      logger.error('Erreur lors de la migration:', error);
+      return res.status(500).json({
+        success: false,
+        action: 'migrate-anonymous',
+        error: 'Erreur lors de la migration',
+        message: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+
+  // Configuration initiale de la base de données
   try {
     logger.info('Initialisation de la base de données...');
 
