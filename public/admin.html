@@ -514,6 +514,7 @@
 
     // Charger les conversations
     async function loadConversations() {
+      switchView('User');  // Afficher la vue "Par utilisateur" par défaut
       await loadUserFilter();
       await loadUserConversations();
     }
