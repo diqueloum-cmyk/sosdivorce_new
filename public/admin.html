@@ -522,6 +522,33 @@
       switchView('User');  // Afficher la vue "Par utilisateur" par défaut
       await loadUserFilter();
       await loadUserConversations();
+      await loadAnonymousCount();  // Charger le compteur des conversations anonymes
+    }
+
+    /**
+     * Charger uniquement le compteur de conversations anonymes
+     */
+    async function loadAnonymousCount() {
+      if (!adminKey) return;
+
+      try {
+        const response = await fetch(
+          `/api/admin-conversations?action=listAnonymous&page=1&limit=1`,
+          {
+            headers: {
+              'X-Admin-Key': adminKey
+            }
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.success && data.pagination) {
+          document.getElementById('anonymousCount').textContent = data.pagination.total;
+        }
+      } catch (error) {
+        console.error('Erreur chargement compteur anonymes:', error);
+      }
     }
 
     async function loadUserFilter() {
