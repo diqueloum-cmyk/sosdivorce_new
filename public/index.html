@@ -10,6 +10,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <!-- jsPDF for PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Immediate cookie check to prevent flicker on page load -->
+  <script>
+    // Fonction pour lire un cookie par son nom
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    // Vérification immédiate de l'état de connexion
+    (function() {
+      const userEmail = getCookie('user_email');
+      if (userEmail) {
+        // Utilisateur probablement connecté, masquer l'interface "déconnecté"
+        document.documentElement.classList.add('user-logged-in');
+      }
+    })();
+  </script>
+
   <style>
     body { font-family: 'Poppins', sans-serif; }
     .typing-cursor { animation: blink 1s infinite; }
@@ -58,6 +79,23 @@
       .sidebar-overlay.open {
         display: block;
       }
+    }
+
+    /* Masquer les éléments "déconnecté" si l'utilisateur est connecté */
+    html.user-logged-in #loginBtn,
+    html.user-logged-in #mainNav,
+    html.user-logged-in #heroSection,
+    html.user-logged-in #about,
+    html.user-logged-in #features,
+    html.user-logged-in #testimonials,
+    html.user-logged-in #faq,
+    html.user-logged-in #contact {
+      display: none !important;
+    }
+
+    /* Afficher la sidebar si l'utilisateur est connecté */
+    html.user-logged-in #conversationSidebar {
+      display: block !important;
     }
 
   </style>
@@ -517,8 +555,11 @@
 
     // Afficher le statut utilisateur
     function showUserStatus(user) {
+      // Ajouter la classe CSS au lieu de manipuler directement les éléments
+      document.documentElement.classList.add('user-logged-in');
+
+      // Afficher les informations utilisateur
       document.getElementById('userStatus').classList.remove('hidden');
-      document.getElementById('loginBtn').classList.add('hidden');
       document.getElementById('userName').textContent = user.firstName || user.email;
 
       // Masquer le compteur de questions gratuites
@@ -527,45 +568,18 @@
       // Afficher la sidebar et charger l'historique
       showConversationSidebar();
       loadConversationHistory();
-
-      // Masquer le menu de navigation
-      const nav = document.getElementById('mainNav');
-      if (nav) {
-        nav.style.display = 'none';
-      }
-
-      // Masquer toutes les sections sauf le chatbot et les tarifs
-      const sectionsToHide = ['heroSection', 'about', 'features', 'testimonials', 'faq', 'contact'];
-      sectionsToHide.forEach(sectionId => {
-        const section = document.getElementById(sectionId);
-        if (section) {
-          section.style.display = 'none';
-        }
-      });
     }
 
     // Masquer le statut utilisateur
     function hideUserStatus() {
+      // Retirer la classe CSS
+      document.documentElement.classList.remove('user-logged-in');
+
+      // Masquer les informations utilisateur
       document.getElementById('userStatus').classList.add('hidden');
-      document.getElementById('loginBtn').classList.remove('hidden');
 
       // Masquer la sidebar
       hideConversationSidebar();
-
-      // Réafficher le menu de navigation
-      const nav = document.getElementById('mainNav');
-      if (nav) {
-        nav.style.display = '';
-      }
-
-      // Réafficher toutes les sections
-      const sectionsToShow = ['heroSection', 'about', 'features', 'testimonials', 'faq', 'contact'];
-      sectionsToShow.forEach(sectionId => {
-        const section = document.getElementById(sectionId);
-        if (section) {
-          section.style.display = 'block';
-        }
-      });
     }
 
     // Lire les cookies (helper function)
