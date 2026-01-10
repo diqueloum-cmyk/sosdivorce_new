@@ -217,9 +217,11 @@
             </div>
 
             <div id="chatContainer" class="space-y-4 mb-4" style="max-height: 400px; overflow-y: auto;">
-              <div class="text-center text-gray-500">
-                <p class="text-sm mb-2">Notre IA spécialisée va vous répondre</p>
-                <p class="text-sm" id="questionCounter">2 questions offertes. Ensuite, nous vous demanderons de vous inscrire pour continuer à poser vos questions toujours gratuitement.</p>
+              <div class="text-center">
+                <p class="text-sm text-gray-500 mb-3">Notre IA spécialisée va vous répondre</p>
+                <div class="inline-block bg-green-50 border border-green-200 rounded-lg p-3 text-left max-w-md" id="questionCounter">
+                  <p class="text-sm text-green-700"><span class="font-bold">✓ Vous avez posé vos 2 questions gratuites</span>, inscrivez-vous pour continuer à poser vos questions, toujours gratuitement.</p>
+                </div>
               </div>
             </div>
             <div class="flex space-x-2">
@@ -622,11 +624,11 @@
 
         const remaining = maxFreeQuestions - questionsUsed;
         if (remaining === 2) {
-          counterElement.textContent = '2 questions offertes. Ensuite, nous vous demanderons de vous inscrire pour continuer à poser vos questions toujours gratuitement.';
+          counterElement.innerHTML = '<p class="text-sm text-green-700"><span class="font-bold">✓ Vous avez posé vos 2 questions gratuites</span>, inscrivez-vous pour continuer à poser vos questions, toujours gratuitement.</p>';
         } else if (remaining === 1) {
-          counterElement.textContent = '1 question offerte restante. Ensuite, nous vous demanderons de vous inscrire pour continuer à poser vos questions toujours gratuitement.';
+          counterElement.innerHTML = '<p class="text-sm text-green-700"><span class="font-bold">✓ Il vous reste 1 question gratuite</span>, inscrivez-vous pour continuer à poser vos questions, toujours gratuitement.</p>';
         } else {
-          counterElement.textContent = 'Créez un compte gratuit pour continuer à poser vos questions toujours gratuitement.';
+          counterElement.innerHTML = '<p class="text-sm text-green-700"><span class="font-bold">✓ Vous avez posé vos 2 questions gratuites</span>, inscrivez-vous pour continuer à poser vos questions, toujours gratuitement.</p>';
         }
       }
     }
@@ -799,9 +801,11 @@
         // Vider la chatbox
         const chatContainer = document.getElementById('chatContainer');
         chatContainer.innerHTML = `
-          <div class="text-center text-gray-500">
-            <p class="text-sm mb-2">Notre IA spécialisée va vous répondre</p>
-            <p class="text-sm" id="questionCounter">2 questions offertes. Ensuite, nous vous demanderons de vous inscrire pour continuer à poser vos questions toujours gratuitement.</p>
+          <div class="text-center">
+            <p class="text-sm text-gray-500 mb-3">Notre IA spécialisée va vous répondre</p>
+            <div class="inline-block bg-green-50 border border-green-200 rounded-lg p-3 text-left max-w-md" id="questionCounter">
+              <p class="text-sm text-green-700"><span class="font-bold">✓ Vous avez posé vos 2 questions gratuites</span>, inscrivez-vous pour continuer à poser vos questions, toujours gratuitement.</p>
+            </div>
           </div>
         `;
 
