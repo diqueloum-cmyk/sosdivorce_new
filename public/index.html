@@ -168,8 +168,7 @@
   <!-- Chatbot Section with History Sidebar -->
   <section class="py-16 px-4 bg-white">
     <div class="max-w-6xl mx-auto">
-      <h2 class="text-3xl font-bold text-center text-blue-900 mb-2">Posez votre question ici</h2>
-      <p class="text-center text-gray-600 mb-8">Notre IA spécialisée va vous répondre</p>
+      <h2 class="text-3xl font-bold text-center text-blue-900 mb-8">Posez votre question ici</h2>
 
       <!-- Overlay for mobile sidebar -->
       <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -219,6 +218,7 @@
 
             <div id="chatContainer" class="space-y-4 mb-4" style="max-height: 400px; overflow-y: auto;">
               <div class="text-center text-gray-500">
+                <p class="text-sm mb-2">Notre IA spécialisée va vous répondre</p>
                 <p class="text-sm" id="questionCounter">2 questions offertes. Ensuite, nous vous demanderons de vous inscrire pour continuer à poser vos questions toujours gratuitement.</p>
               </div>
             </div>
@@ -800,6 +800,7 @@
         const chatContainer = document.getElementById('chatContainer');
         chatContainer.innerHTML = `
           <div class="text-center text-gray-500">
+            <p class="text-sm mb-2">Notre IA spécialisée va vous répondre</p>
             <p class="text-sm" id="questionCounter">2 questions offertes. Ensuite, nous vous demanderons de vous inscrire pour continuer à poser vos questions toujours gratuitement.</p>
           </div>
         `;
@@ -1264,7 +1265,7 @@
       document.getElementById('currentSessionTitle').textContent = 'Nouvelle conversation';
       document.getElementById('chatContainer').innerHTML = `
         <div class="text-center text-gray-500">
-
+          <p class="text-sm">Notre IA spécialisée va vous répondre</p>
         </div>
       `;
       renderSessionList();
