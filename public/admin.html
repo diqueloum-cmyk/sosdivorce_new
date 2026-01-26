@@ -64,8 +64,14 @@
             <button id="tabStats" class="tab-button active px-6 py-3 font-semibold text-blue-900 border-b-2 border-blue-900">
               Statistiques
             </button>
+            <button id="tabPayments" class="tab-button px-6 py-3 font-semibold text-gray-600 hover:text-blue-900">
+              Paiements
+            </button>
             <button id="tabConversations" class="tab-button px-6 py-3 font-semibold text-gray-600 hover:text-blue-900">
               Conversations
+            </button>
+            <button id="tabSettings" class="tab-button px-6 py-3 font-semibold text-gray-600 hover:text-blue-900">
+              Paramètres
             </button>
           </div>
         </div>
@@ -112,6 +118,113 @@
 
         </div>
         <!-- Fin Contenu Onglet Statistiques -->
+
+        <!-- Contenu Onglet Paiements -->
+        <div id="contentPayments" class="tab-content hidden">
+          <!-- Statistiques Paiements -->
+          <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-green-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-green-900">Revenus Totaux</h3>
+              <p id="totalRevenue" class="text-2xl font-bold text-green-600">-</p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-blue-900">Sessions Payées</h3>
+              <p id="totalPaidSessions" class="text-2xl font-bold text-blue-600">-</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-purple-900">Analyses Express</h3>
+              <p id="expressCount" class="text-2xl font-bold text-purple-600">-</p>
+            </div>
+            <div class="bg-orange-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-orange-900">Analyses Premium</h3>
+              <p id="premiumCount" class="text-2xl font-bold text-orange-600">-</p>
+            </div>
+          </div>
+
+          <!-- Boutons d'action -->
+          <div class="mb-6 flex gap-4">
+            <button onclick="loadPaymentStats()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              Actualiser
+            </button>
+            <button onclick="exportPayments()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+              Exporter CSV
+            </button>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" id="paidOnlyFilter" onchange="loadPaidSessions()" checked>
+              <span class="text-gray-700">Afficher uniquement les sessions payées</span>
+            </label>
+          </div>
+
+          <!-- Liste des sessions payées -->
+          <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Formule</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date Paiement</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="paidSessionsList" class="bg-white divide-y divide-gray-200">
+                <!-- Rempli dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination paiements -->
+          <div id="paymentsPagination" class="flex justify-center gap-2 mt-6">
+            <!-- Boutons de pagination -->
+          </div>
+
+          <!-- Modal Détail Session Payée -->
+          <div id="paidSessionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto">
+            <div class="flex justify-center min-h-screen p-4">
+              <div class="bg-white rounded-lg max-w-4xl w-full my-auto p-8">
+                <div class="flex justify-between items-center mb-6">
+                  <h2 id="paidModalTitle" class="text-2xl font-bold text-blue-900">Détail de la session</h2>
+                  <button onclick="closePaidSessionModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+
+                <!-- Infos session -->
+                <div class="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-lg">
+                  <div>
+                    <p class="text-sm text-gray-500">Email</p>
+                    <p id="paidModalEmail" class="font-semibold">-</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Formule</p>
+                    <p id="paidModalExpertise" class="font-semibold">-</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Montant</p>
+                    <p id="paidModalAmount" class="font-semibold">-</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Date paiement</p>
+                    <p id="paidModalDate" class="font-semibold">-</p>
+                  </div>
+                </div>
+
+                <!-- Messages de la conversation -->
+                <h3 class="text-lg font-semibold mb-4">Conversation</h3>
+                <div id="paidModalMessages" class="space-y-4 max-h-96 overflow-y-auto">
+                  <!-- Messages -->
+                </div>
+
+                <div class="mt-6 flex gap-4">
+                  <button onclick="closePaidSessionModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                    Fermer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Fin Contenu Onglet Paiements -->
 
         <!-- Contenu Onglet Conversations -->
         <div id="contentConversations" class="tab-content hidden">
@@ -221,6 +334,46 @@
 
         </div>
         <!-- Fin Contenu Onglet Conversations -->
+
+        <!-- Contenu Onglet Paramètres -->
+        <div id="contentSettings" class="tab-content hidden">
+          <h2 class="text-xl font-semibold text-gray-800 mb-6">Paramètres du site</h2>
+
+          <!-- Section Mode Maintenance -->
+          <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">Mode Maintenance</h3>
+                <p class="text-gray-600 text-sm mt-1">
+                  Lorsque le mode maintenance est activé, les visiteurs voient une page de maintenance et doivent entrer le code d'accès pour accéder au site.
+                </p>
+                <p id="maintenanceStatusText" class="mt-2 text-sm font-medium">
+                  <!-- Rempli dynamiquement -->
+                </p>
+              </div>
+              <div class="flex items-center gap-4">
+                <span id="maintenanceStatus" class="px-3 py-1 rounded-full text-sm font-medium">
+                  <!-- Rempli dynamiquement -->
+                </span>
+                <button id="toggleMaintenanceBtn" onclick="toggleMaintenance()" class="px-6 py-2 rounded-lg font-medium transition-colors">
+                  <!-- Rempli dynamiquement -->
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations supplémentaires -->
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h4 class="font-semibold text-blue-900 mb-2">Code d'accès maintenance</h4>
+            <p class="text-blue-800">
+              Le code d'accès pour bypasser la page maintenance est : <code class="bg-blue-100 px-2 py-1 rounded font-mono">789654123</code>
+            </p>
+            <p class="text-blue-700 text-sm mt-2">
+              Ce code permet aux administrateurs et testeurs d'accéder au site même en mode maintenance.
+            </p>
+          </div>
+        </div>
+        <!-- Fin Contenu Onglet Paramètres -->
 
       </div>
     </div>
@@ -455,9 +608,20 @@
       switchTab('Stats');
     });
 
+    document.getElementById('tabPayments').addEventListener('click', () => {
+      switchTab('Payments');
+      loadPaymentStats();
+      loadPaidSessions();
+    });
+
     document.getElementById('tabConversations').addEventListener('click', () => {
       switchTab('Conversations');
       loadConversations();
+    });
+
+    document.getElementById('tabSettings').addEventListener('click', () => {
+      switchTab('Settings');
+      loadMaintenanceStatus();
     });
 
     function switchTab(tab) {
@@ -990,6 +1154,362 @@
       currentPage = 1;
       loadAllConversations();
     });
+
+    // ====================================
+    // FONCTIONS PAIEMENTS
+    // ====================================
+
+    let currentPaymentsPage = 1;
+    let currentPaidSessionId = null;
+
+    /**
+     * Charger les statistiques de paiements
+     */
+    async function loadPaymentStats() {
+      if (!adminKey) return;
+
+      try {
+        const response = await fetch('/api/admin-payments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({ action: 'stats', adminKey })
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.stats) {
+          const stats = data.stats;
+
+          // Formater les revenus en euros
+          const revenueEuros = (stats.totalRevenue / 100).toFixed(2);
+          document.getElementById('totalRevenue').textContent = `${revenueEuros} €`;
+          document.getElementById('totalPaidSessions').textContent = stats.totalPaid || 0;
+          document.getElementById('expressCount').textContent = stats.byExpertise?.classique || 0;
+          document.getElementById('premiumCount').textContent = stats.byExpertise?.premium || 0;
+        }
+      } catch (error) {
+        showError('Erreur chargement statistiques paiements: ' + error.message);
+      }
+    }
+
+    /**
+     * Charger les sessions payées
+     */
+    async function loadPaidSessions(page = 1) {
+      if (!adminKey) return;
+
+      currentPaymentsPage = page;
+      const paidOnly = document.getElementById('paidOnlyFilter').checked;
+
+      try {
+        const response = await fetch('/api/admin-payments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({
+            action: 'list',
+            adminKey,
+            page,
+            limit: 50,
+            paidOnly
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          renderPaidSessions(data.sessions || []);
+          renderPaymentsPagination(data.pagination);
+        }
+      } catch (error) {
+        showError('Erreur chargement sessions: ' + error.message);
+      }
+    }
+
+    /**
+     * Afficher les sessions payées dans le tableau
+     */
+    function renderPaidSessions(sessions) {
+      const tbody = document.getElementById('paidSessionsList');
+      tbody.innerHTML = '';
+
+      if (sessions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+              Aucune session trouvée
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      sessions.forEach(session => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50';
+
+        // Formater le montant
+        const amountEuros = session.amount ? (session.amount / 100).toFixed(2) + ' €' : '-';
+
+        // Formater la date
+        const paidDate = session.paid_at
+          ? new Date(session.paid_at).toLocaleDateString('fr-FR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : '-';
+
+        // Badge expertise
+        let expertiseBadge = '-';
+        if (session.expertise === 'classique') {
+          expertiseBadge = '<span class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">Express</span>';
+        } else if (session.expertise === 'premium') {
+          expertiseBadge = '<span class="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs">Premium</span>';
+        }
+
+        // Badge statut
+        const statusBadge = session.paid
+          ? '<span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Payé</span>'
+          : '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">En attente</span>';
+
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${session.id}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${session.email || 'Non renseigné'}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">${expertiseBadge}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${amountEuros}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${paidDate}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <button onclick="showPaidSession('${session.session_uuid}')" class="text-blue-600 hover:text-blue-900">
+              Voir détails
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    /**
+     * Pagination des paiements
+     */
+    function renderPaymentsPagination(pagination) {
+      const container = document.getElementById('paymentsPagination');
+      container.innerHTML = '';
+
+      if (!pagination || pagination.totalPages <= 1) return;
+
+      for (let i = 1; i <= pagination.totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = i === pagination.page
+          ? 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700'
+          : 'px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300';
+        btn.onclick = () => loadPaidSessions(i);
+        container.appendChild(btn);
+      }
+    }
+
+    /**
+     * Afficher le détail d'une session payée
+     */
+    async function showPaidSession(sessionUuid) {
+      if (!adminKey) return;
+
+      currentPaidSessionId = sessionUuid;
+
+      try {
+        const response = await fetch('/api/admin-payments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({
+            action: 'messages',
+            adminKey,
+            sessionId: sessionUuid
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          const session = data.session;
+          const messages = data.messages || [];
+
+          // Remplir les infos session
+          document.getElementById('paidModalEmail').textContent = session.email || 'Non renseigné';
+
+          let expertiseText = '-';
+          if (session.expertise === 'classique') expertiseText = 'Analyse Express (29€)';
+          else if (session.expertise === 'premium') expertiseText = 'Analyse Premium (49€)';
+          document.getElementById('paidModalExpertise').textContent = expertiseText;
+
+          const amountEuros = session.amount ? (session.amount / 100).toFixed(2) + ' €' : '-';
+          document.getElementById('paidModalAmount').textContent = amountEuros;
+
+          const paidDate = session.paid_at
+            ? new Date(session.paid_at).toLocaleString('fr-FR')
+            : 'Non payé';
+          document.getElementById('paidModalDate').textContent = paidDate;
+
+          // Afficher les messages
+          const messagesContainer = document.getElementById('paidModalMessages');
+          messagesContainer.innerHTML = '';
+
+          if (messages.length === 0) {
+            messagesContainer.innerHTML = '<p class="text-gray-500">Aucun message dans cette conversation</p>';
+          } else {
+            messages.forEach(msg => {
+              const msgDiv = document.createElement('div');
+              msgDiv.className = msg.role === 'user'
+                ? 'bg-blue-50 p-4 rounded-lg'
+                : 'bg-gray-50 p-4 rounded-lg';
+
+              const roleDiv = document.createElement('div');
+              roleDiv.className = `font-bold text-sm mb-2 ${msg.role === 'user' ? 'text-blue-900' : 'text-gray-700'}`;
+              roleDiv.textContent = msg.role === 'user' ? 'Utilisateur' : 'Assistant';
+
+              const contentDiv = document.createElement('div');
+              contentDiv.className = 'text-gray-800 whitespace-pre-wrap';
+              contentDiv.textContent = msg.content;
+
+              const dateDiv = document.createElement('div');
+              dateDiv.className = 'text-xs text-gray-500 mt-2';
+              dateDiv.textContent = new Date(msg.created_at).toLocaleString('fr-FR');
+
+              msgDiv.appendChild(roleDiv);
+              msgDiv.appendChild(contentDiv);
+              msgDiv.appendChild(dateDiv);
+              messagesContainer.appendChild(msgDiv);
+            });
+          }
+
+          // Afficher le modal
+          document.getElementById('paidSessionModal').classList.remove('hidden');
+        }
+      } catch (error) {
+        showError('Erreur chargement détail session: ' + error.message);
+      }
+    }
+
+    /**
+     * Fermer le modal session payée
+     */
+    function closePaidSessionModal() {
+      document.getElementById('paidSessionModal').classList.add('hidden');
+      currentPaidSessionId = null;
+    }
+
+    /**
+     * Exporter les paiements en CSV
+     */
+    function exportPayments() {
+      if (!adminKey) return;
+      window.location.href = `/api/admin-payments?action=export&adminKey=${adminKey}`;
+    }
+
+    // ====================================
+    // FONCTIONS MODE MAINTENANCE
+    // ====================================
+
+    let maintenanceEnabled = true;
+
+    /**
+     * Charger l'état actuel du mode maintenance
+     */
+    async function loadMaintenanceStatus() {
+      try {
+        const response = await fetch('/api/maintenance');
+        const data = await response.json();
+
+        if (data.success) {
+          maintenanceEnabled = data.maintenanceEnabled;
+          updateMaintenanceUI();
+        }
+      } catch (error) {
+        showError('Erreur chargement état maintenance: ' + error.message);
+      }
+    }
+
+    /**
+     * Mettre à jour l'interface selon l'état maintenance
+     */
+    function updateMaintenanceUI() {
+      const statusBadge = document.getElementById('maintenanceStatus');
+      const statusText = document.getElementById('maintenanceStatusText');
+      const toggleBtn = document.getElementById('toggleMaintenanceBtn');
+
+      if (maintenanceEnabled) {
+        statusBadge.textContent = 'ACTIVÉ';
+        statusBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800';
+        statusText.textContent = 'Le site affiche actuellement la page de maintenance aux visiteurs.';
+        statusText.className = 'mt-2 text-sm font-medium text-red-600';
+        toggleBtn.textContent = 'Désactiver';
+        toggleBtn.className = 'px-6 py-2 rounded-lg font-medium transition-colors bg-green-600 text-white hover:bg-green-700';
+      } else {
+        statusBadge.textContent = 'DÉSACTIVÉ';
+        statusBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
+        statusText.textContent = 'Le site est accessible normalement à tous les visiteurs.';
+        statusText.className = 'mt-2 text-sm font-medium text-green-600';
+        toggleBtn.textContent = 'Activer';
+        toggleBtn.className = 'px-6 py-2 rounded-lg font-medium transition-colors bg-red-600 text-white hover:bg-red-700';
+      }
+    }
+
+    /**
+     * Basculer le mode maintenance
+     */
+    async function toggleMaintenance() {
+      if (!adminKey) {
+        showError('Vous devez être connecté pour modifier le mode maintenance');
+        return;
+      }
+
+      const newState = !maintenanceEnabled;
+      const action = newState ? 'activer' : 'désactiver';
+
+      if (!confirm(`Êtes-vous sûr de vouloir ${action} le mode maintenance ?`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/maintenance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({ enabled: newState })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          maintenanceEnabled = data.maintenanceEnabled;
+          updateMaintenanceUI();
+
+          // Afficher un message de confirmation
+          const message = maintenanceEnabled
+            ? 'Mode maintenance activé. Les visiteurs verront la page de maintenance.'
+            : 'Mode maintenance désactivé. Le site est maintenant accessible à tous.';
+          alert(message);
+        } else {
+          throw new Error(data.error || 'Erreur lors de la modification');
+        }
+      } catch (error) {
+        showError('Erreur modification maintenance: ' + error.message);
+      }
+    }
   </script>
 </body>
 </html>

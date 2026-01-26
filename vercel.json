@@ -4,6 +4,18 @@
     "api/chat.js": {
       "maxDuration": 60
     },
+    "api/create-session.js": {
+      "maxDuration": 10
+    },
+    "api/create-payment-intent.js": {
+      "maxDuration": 10
+    },
+    "api/verify-payment.js": {
+      "maxDuration": 10
+    },
+    "api/admin-payments.js": {
+      "maxDuration": 10
+    },
     "api/signup.js": {
       "maxDuration": 10
     },
@@ -11,6 +23,9 @@
       "maxDuration": 10
     },
     "api/conversations.js": {
+      "maxDuration": 10
+    },
+    "api/maintenance.js": {
       "maxDuration": 10
     }
   },

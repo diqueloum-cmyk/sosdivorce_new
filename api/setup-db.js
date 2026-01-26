@@ -7,7 +7,8 @@ import {
   createUsersTable,
   createCacheTable,
   createConversationTables,
-  migrateConversationTablesForAnonymous
+  migrateConversationTablesForAnonymous,
+  createPaidSessionsTables
 } from '../lib/db.js';
 import logger from '../lib/logger.js';
 
@@ -91,6 +92,10 @@ export default async function handler(req, res) {
     const conversationResult = await createConversationTables();
     logger.info('Tables de conversation créées');
 
+    // Créer les tables pour les sessions payées
+    const paidSessionsResult = await createPaidSessionsTables();
+    logger.info('Tables paid_sessions créées');
+
     logger.info('Base de données initialisée avec succès');
 
     return res.status(200).json({
@@ -99,7 +104,8 @@ export default async function handler(req, res) {
       details: {
         users: usersResult,
         cache: cacheResult,
-        conversations: conversationResult
+        conversations: conversationResult,
+        paidSessions: paidSessionsResult
       },
       timestamp: new Date().toISOString(),
       info: {
