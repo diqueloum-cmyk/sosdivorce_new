@@ -559,7 +559,7 @@
     // CONFIGURATION
     // ====================================
     const CONFIG = {
-      stripePublicKey: 'pk_test_51SrNCkPw4xvsWxrUnYCrm3Z6C8015jgyI6GBbePy3vi0Wm4Z5IUtX9GwiP8CP5loolhCryPGu7zlzFDtorLBwMSn00NNubWeUU',
+      stripePublicKey: null, // Sera chargée depuis l'API
       expertisePrices: {
         classique: 2900, // 29€ en centimes
         premium: 4900    // 49€ en centimes
@@ -569,6 +569,19 @@
         premium: 'Analyse Premium validée avocat'
       }
     };
+
+    // Charger la configuration Stripe depuis le serveur
+    async function loadStripeConfig() {
+      try {
+        const response = await fetch('/api/config');
+        const data = await response.json();
+        if (data.success && data.stripePublicKey) {
+          CONFIG.stripePublicKey = data.stripePublicKey;
+        }
+      } catch (error) {
+        console.error('Erreur chargement config Stripe:', error);
+      }
+    }
 
     // ====================================
     // STATE
@@ -588,7 +601,10 @@
     // ====================================
     // INITIALIZATION
     // ====================================
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Charger la config Stripe en premier
+      await loadStripeConfig();
+      // Puis initialiser le chat
       initChatSession();
     });
 
@@ -849,6 +865,11 @@
     // Initier le paiement
     async function initiatePayment() {
       try {
+        // Vérifier que la clé Stripe est chargée
+        if (!CONFIG.stripePublicKey) {
+          throw new Error('Configuration Stripe non chargée. Veuillez rafraîchir la page.');
+        }
+
         // Masquer la section chat et afficher la section paiement
         showSection('paymentSection');
 
