@@ -1,6 +1,7 @@
 import { setCorsHeaders, handleCorsPreflight } from '../lib/utils.js';
 import {
   getAllPaidSessions,
+  getPaidSession,
   getPaidSessionMessages,
   getPaymentStats
 } from '../lib/db.js';
@@ -42,15 +43,33 @@ export default async function handler(req, res) {
         });
 
       case 'messages':
-        // Récupérer les messages d'une session
+        // Récupérer les messages d'une session (accepte UUID ou ID numérique)
         if (!sessionId) {
           return res.status(400).json({ error: 'sessionId requis' });
         }
 
-        const messages = await getPaidSessionMessages(parseInt(sessionId));
+        // Récupérer d'abord la session complète via UUID
+        const session = await getPaidSession(sessionId);
+        if (!session) {
+          return res.status(404).json({ error: 'Session non trouvée' });
+        }
+
+        // Puis récupérer les messages avec l'ID numérique
+        const messages = await getPaidSessionMessages(session.id);
 
         return res.status(200).json({
           success: true,
+          session: {
+            id: session.id,
+            sessionUuid: session.sessionUuid,
+            email: session.email,
+            expertise: session.expertise,
+            amount: session.amount,
+            paid: session.paid,
+            paidAt: session.paidAt,
+            threadId: session.threadId,
+            emailSent: session.emailSent
+          },
           messages,
           count: messages.length
         });
