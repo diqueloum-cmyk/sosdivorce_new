@@ -2,7 +2,11 @@ import { setCorsHeaders, handleCorsPreflight } from '../lib/utils.js';
 import {
   getPaidSession,
   addPaidMessage,
-  updatePaidSessionEmail
+  updatePaidSessionEmail,
+  getUnpaidSession,
+  updateUnpaidSessionEmail,
+  moveSessionToUnpaid,
+  addUnpaidMessage
 } from '../lib/db.js';
 import {
   chatRateLimiter,
@@ -121,8 +125,19 @@ export default async function handler(req, res) {
     const emailMatch = message.match(emailRegex);
     if (emailMatch && !session.email) {
       const extractedEmail = emailMatch[0];
-      await updatePaidSessionEmail(sessionId, extractedEmail);
-      logger.info('Email extrait et sauvegardé:', { sessionId, email: extractedEmail });
+
+      // Vérifier si la session existe déjà dans unpaid_sessions
+      const unpaidSession = await getUnpaidSession(sessionId);
+
+      if (unpaidSession) {
+        // Mettre à jour l'email dans la table unpaid
+        await updateUnpaidSessionEmail(sessionId, extractedEmail);
+        logger.info('Email unpaid session mis à jour:', { sessionId, email: extractedEmail });
+      } else {
+        // Créer une entrée dans unpaid_sessions (avec copie des messages existants)
+        await moveSessionToUnpaid(sessionId, extractedEmail);
+        logger.info('Session déplacée vers unpaid_sessions:', { sessionId, email: extractedEmail });
+      }
     }
 
     // ====================================
@@ -250,16 +265,27 @@ export default async function handler(req, res) {
     // SAUVEGARDER LES MESSAGES EN BASE
     // ====================================
     try {
-      // Sauvegarder la question de l'utilisateur
-      await addPaidMessage(session.id, 'user', message);
+      // Vérifier si la session est dans unpaid_sessions
+      const unpaidSession = await getUnpaidSession(sessionId);
 
-      // Sauvegarder la réponse de l'assistant
-      await addPaidMessage(session.id, 'assistant', answer);
-
-      logger.info('Messages sauvegardés:', {
-        sessionId,
-        responseTimeMs
-      });
+      if (unpaidSession) {
+        // Sauvegarder dans unpaid_messages
+        await addUnpaidMessage(unpaidSession.id, 'user', message);
+        await addUnpaidMessage(unpaidSession.id, 'assistant', answer);
+        logger.info('Messages sauvegardés dans unpaid_messages:', {
+          sessionId,
+          unpaidSessionId: unpaidSession.id,
+          responseTimeMs
+        });
+      } else {
+        // Sauvegarder dans paid_messages (comportement par défaut)
+        await addPaidMessage(session.id, 'user', message);
+        await addPaidMessage(session.id, 'assistant', answer);
+        logger.info('Messages sauvegardés dans paid_messages:', {
+          sessionId,
+          responseTimeMs
+        });
+      }
 
     } catch (error) {
       // Ne pas bloquer la réponse si la sauvegarde échoue

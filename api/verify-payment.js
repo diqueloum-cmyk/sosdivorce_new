@@ -1,5 +1,5 @@
 import { setCorsHeaders, handleCorsPreflight } from '../lib/utils.js';
-import { getPaidSession, markPaidSessionCompleted, getPaidSessionMessages, markEmailSent } from '../lib/db.js';
+import { getPaidSession, markPaidSessionCompleted, getPaidSessionMessages, markEmailSent, migrateUnpaidToPaidSession } from '../lib/db.js';
 import { sendAnalysisEmail } from '../lib/email.js';
 import logger from '../lib/logger.js';
 import Stripe from 'stripe';
@@ -68,7 +68,14 @@ export default async function handler(req, res) {
 
     // Vérifier que le paiement a réussi
     if (paymentIntent.status === 'succeeded') {
-      // Marquer la session comme payée
+      // NOUVEAU: Migrer depuis unpaid_sessions vers paid_sessions si nécessaire
+      const wasMigrated = await migrateUnpaidToPaidSession(sessionId, session.email);
+
+      if (wasMigrated) {
+        logger.info('Session migrée de unpaid vers paid:', { sessionId });
+      }
+
+      // Marquer la session comme payée (déjà dans paid_sessions maintenant)
       await markPaidSessionCompleted(sessionId, session.email);
 
       logger.info('Paiement vérifié et confirmé:', {
@@ -76,7 +83,8 @@ export default async function handler(req, res) {
         paymentIntentId,
         expertise: session.expertise,
         amount: session.amount,
-        email: session.email
+        email: session.email,
+        migrated: wasMigrated
       });
 
       // Envoyer l'email d'analyse si l'email est disponible

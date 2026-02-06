@@ -121,6 +121,20 @@
 
         <!-- Contenu Onglet Paiements -->
         <div id="contentPayments" class="tab-content hidden">
+          <!-- Sous-onglets Paiements -->
+          <div class="mb-6">
+            <div class="flex gap-4">
+              <button id="viewPaidSessions" class="sub-tab-button active px-4 py-2 bg-blue-600 text-white rounded">
+                Sessions payées
+              </button>
+              <button id="viewUnpaidWithEmail" class="sub-tab-button px-4 py-2 bg-gray-300 text-gray-700 rounded">
+                Emails collectés (non payés)
+              </button>
+            </div>
+          </div>
+
+          <!-- Vue Sessions Payées -->
+          <div id="viewPaidSessionsContent" class="view-content">
           <!-- Statistiques Paiements -->
           <div class="grid md:grid-cols-4 gap-6 mb-8">
             <div class="bg-green-50 p-4 rounded-lg">
@@ -223,6 +237,108 @@
               </div>
             </div>
           </div>
+          </div>
+          <!-- Fin Vue Sessions Payées -->
+
+          <!-- Vue Sessions Non Payées avec Email -->
+          <div id="viewUnpaidWithEmailContent" class="view-content hidden">
+            <!-- Statistiques Unpaid -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+              <div class="bg-yellow-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-yellow-900">Emails collectés (non payés)</h3>
+                <p id="unpaidWithEmailCount" class="text-2xl font-bold text-yellow-600">-</p>
+              </div>
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-blue-900">Taux de conversion</h3>
+                <p id="conversionRate" class="text-2xl font-bold text-blue-600">-</p>
+              </div>
+              <div class="bg-green-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-green-900">Aujourd'hui</h3>
+                <p id="unpaidToday" class="text-2xl font-bold text-green-600">-</p>
+              </div>
+            </div>
+
+            <!-- Actions Unpaid -->
+            <div class="mb-6 flex gap-4">
+              <button onclick="loadUnpaidSessions()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Actualiser
+              </button>
+              <button onclick="exportUnpaidSessions()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                Exporter CSV
+              </button>
+            </div>
+
+            <!-- Table Sessions Unpaid -->
+            <div class="bg-white rounded-lg shadow overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Formule</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date collecte</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Messages</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tentatives</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="unpaidSessionsList" class="bg-white divide-y divide-gray-200">
+                  <!-- Rempli dynamiquement -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination unpaid -->
+            <div id="unpaidPagination" class="flex justify-center gap-2 mt-6">
+              <!-- Boutons de pagination -->
+            </div>
+
+            <!-- Modal Détail Session Unpaid -->
+            <div id="unpaidSessionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto">
+              <div class="flex justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-4xl w-full my-auto p-8">
+                  <div class="flex justify-between items-center mb-6">
+                    <h2 id="unpaidModalTitle" class="text-2xl font-bold text-blue-900">Détail de la session non payée</h2>
+                    <button onclick="closeUnpaidSessionModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                  </div>
+
+                  <!-- Infos session unpaid -->
+                  <div class="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-lg">
+                    <div>
+                      <p class="text-sm text-gray-500">Email</p>
+                      <p id="unpaidModalEmail" class="font-semibold">-</p>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-500">Formule sélectionnée</p>
+                      <p id="unpaidModalExpertise" class="font-semibold">-</p>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-500">Date collecte email</p>
+                      <p id="unpaidModalCollectDate" class="font-semibold">-</p>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-500">Tentatives de paiement</p>
+                      <p id="unpaidModalAttempts" class="font-semibold">-</p>
+                    </div>
+                  </div>
+
+                  <!-- Messages de la conversation -->
+                  <h3 class="text-lg font-semibold mb-4">Conversation</h3>
+                  <div id="unpaidModalMessages" class="space-y-4 max-h-96 overflow-y-auto">
+                    <!-- Messages -->
+                  </div>
+
+                  <div class="mt-6 flex gap-4">
+                    <button onclick="closeUnpaidSessionModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                      Fermer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Fin Vue Sessions Non Payées -->
+
         </div>
         <!-- Fin Contenu Onglet Paiements -->
 
@@ -1509,6 +1625,278 @@
       } catch (error) {
         showError('Erreur modification maintenance: ' + error.message);
       }
+    }
+
+    // ====================================
+    // FONCTIONS SESSIONS NON PAYÉES AVEC EMAIL
+    // ====================================
+
+    let currentUnpaidPage = 1;
+    let currentUnpaidSessionId = null;
+
+    // Gestion des sous-onglets paiements
+    document.getElementById('viewPaidSessions').addEventListener('click', () => {
+      switchPaymentView('Paid');
+    });
+
+    document.getElementById('viewUnpaidWithEmail').addEventListener('click', () => {
+      switchPaymentView('Unpaid');
+      loadUnpaidSessions();
+    });
+
+    function switchPaymentView(view) {
+      // Désactiver tous les sous-onglets
+      document.querySelectorAll('.sub-tab-button').forEach(btn => {
+        btn.classList.remove('active', 'bg-blue-600', 'text-white');
+        btn.classList.add('bg-gray-300', 'text-gray-700');
+      });
+      document.querySelectorAll('.view-content').forEach(content => content.classList.add('hidden'));
+
+      if (view === 'Paid') {
+        const btn = document.getElementById('viewPaidSessions');
+        btn.classList.add('active', 'bg-blue-600', 'text-white');
+        btn.classList.remove('bg-gray-300', 'text-gray-700');
+        document.getElementById('viewPaidSessionsContent').classList.remove('hidden');
+      } else if (view === 'Unpaid') {
+        const btn = document.getElementById('viewUnpaidWithEmail');
+        btn.classList.add('active', 'bg-blue-600', 'text-white');
+        btn.classList.remove('bg-gray-300', 'text-gray-700');
+        document.getElementById('viewUnpaidWithEmailContent').classList.remove('hidden');
+      }
+    }
+
+    /**
+     * Charger les sessions unpaid
+     */
+    async function loadUnpaidSessions(page = 1) {
+      if (!adminKey) return;
+
+      currentUnpaidPage = page;
+
+      try {
+        const response = await fetch('/api/admin-unpaid-sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({
+            action: 'list',
+            limit: 50,
+            offset: (page - 1) * 50
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          renderUnpaidSessions(data.sessions || []);
+          renderUnpaidPagination(data.pagination);
+          loadUnpaidStats();
+        } else {
+          showError('Erreur: ' + (data.error || 'Erreur inconnue'));
+        }
+      } catch (error) {
+        showError('Erreur chargement sessions non payées: ' + error.message);
+      }
+    }
+
+    /**
+     * Charger les statistiques unpaid
+     */
+    async function loadUnpaidStats() {
+      if (!adminKey) return;
+
+      try {
+        const response = await fetch('/api/admin-unpaid-sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({ action: 'stats' })
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.stats) {
+          document.getElementById('unpaidWithEmailCount').textContent = data.stats.totalUnpaid || 0;
+          document.getElementById('conversionRate').textContent = (data.stats.conversionRate || 0) + '%';
+          document.getElementById('unpaidToday').textContent = data.stats.todayUnpaid || 0;
+        }
+      } catch (error) {
+        console.error('Erreur chargement stats unpaid:', error);
+      }
+    }
+
+    /**
+     * Afficher les sessions unpaid dans le tableau
+     */
+    function renderUnpaidSessions(sessions) {
+      const tbody = document.getElementById('unpaidSessionsList');
+      tbody.innerHTML = '';
+
+      if (sessions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+              Aucune session non payée trouvée
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      sessions.forEach(session => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50';
+
+        const collectDate = session.email_collected_at
+          ? new Date(session.email_collected_at).toLocaleDateString('fr-FR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            })
+          : '-';
+
+        const expertiseDisplay = session.expertise
+          ? (session.expertise === 'classique' ? 'Express' : 'Premium')
+          : 'Non sélectionné';
+
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${session.id}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${session.email}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${expertiseDisplay}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${collectDate}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${session.messageCount || 0}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${session.payment_attempts || 0}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <button onclick="showUnpaidSession('${session.session_uuid}')" class="text-blue-600 hover:text-blue-900">
+              Voir conversation
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    /**
+     * Pagination pour unpaid sessions
+     */
+    function renderUnpaidPagination(pagination) {
+      const container = document.getElementById('unpaidPagination');
+      container.innerHTML = '';
+
+      if (!pagination || pagination.totalPages <= 1) return;
+
+      for (let i = 1; i <= pagination.totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = i === pagination.page
+          ? 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700'
+          : 'px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300';
+        btn.onclick = () => loadUnpaidSessions(i);
+        container.appendChild(btn);
+      }
+    }
+
+    /**
+     * Afficher le détail d'une session unpaid
+     */
+    async function showUnpaidSession(sessionUuid) {
+      if (!adminKey) return;
+
+      currentUnpaidSessionId = sessionUuid;
+
+      try {
+        const response = await fetch('/api/admin-unpaid-sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({
+            action: 'messages',
+            sessionId: sessionUuid
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          const session = data.session;
+          const messages = data.messages || [];
+
+          // Remplir les infos session
+          document.getElementById('unpaidModalEmail').textContent = session.email || 'Non renseigné';
+
+          let expertiseText = 'Non sélectionné';
+          if (session.expertise === 'classique') expertiseText = 'Analyse Express (29€)';
+          else if (session.expertise === 'premium') expertiseText = 'Analyse Premium (49€)';
+          document.getElementById('unpaidModalExpertise').textContent = expertiseText;
+
+          const collectDate = session.email_collected_at
+            ? new Date(session.email_collected_at).toLocaleString('fr-FR')
+            : 'Non collecté';
+          document.getElementById('unpaidModalCollectDate').textContent = collectDate;
+
+          document.getElementById('unpaidModalAttempts').textContent = session.payment_attempts || 0;
+
+          // Afficher les messages
+          const messagesContainer = document.getElementById('unpaidModalMessages');
+          messagesContainer.innerHTML = '';
+
+          if (messages.length === 0) {
+            messagesContainer.innerHTML = '<p class="text-gray-500">Aucun message dans cette conversation</p>';
+          } else {
+            messages.forEach(msg => {
+              const msgDiv = document.createElement('div');
+              msgDiv.className = msg.role === 'user'
+                ? 'bg-blue-50 p-4 rounded-lg'
+                : 'bg-gray-50 p-4 rounded-lg';
+
+              const roleDiv = document.createElement('div');
+              roleDiv.className = `font-bold text-sm mb-2 ${msg.role === 'user' ? 'text-blue-900' : 'text-gray-700'}`;
+              roleDiv.textContent = msg.role === 'user' ? 'Utilisateur' : 'Assistant';
+
+              const contentDiv = document.createElement('div');
+              contentDiv.className = 'text-gray-800 whitespace-pre-wrap';
+              contentDiv.textContent = msg.content;
+
+              const dateDiv = document.createElement('div');
+              dateDiv.className = 'text-xs text-gray-500 mt-2';
+              dateDiv.textContent = new Date(msg.created_at).toLocaleString('fr-FR');
+
+              msgDiv.appendChild(roleDiv);
+              msgDiv.appendChild(contentDiv);
+              msgDiv.appendChild(dateDiv);
+              messagesContainer.appendChild(msgDiv);
+            });
+          }
+
+          // Afficher le modal
+          document.getElementById('unpaidSessionModal').classList.remove('hidden');
+        }
+      } catch (error) {
+        showError('Erreur chargement détail session: ' + error.message);
+      }
+    }
+
+    /**
+     * Fermer le modal unpaid session
+     */
+    function closeUnpaidSessionModal() {
+      document.getElementById('unpaidSessionModal').classList.add('hidden');
+      currentUnpaidSessionId = null;
+    }
+
+    /**
+     * Exporter les sessions unpaid en CSV
+     */
+    function exportUnpaidSessions() {
+      if (!adminKey) return;
+      window.location.href = `/api/admin-unpaid-sessions?action=export&adminKey=${adminKey}`;
     }
   </script>
 </body>
