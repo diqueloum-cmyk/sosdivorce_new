@@ -1257,8 +1257,8 @@
         const amountEuros = session.amount ? (session.amount / 100).toFixed(2) + ' €' : '-';
 
         // Formater la date
-        const paidDate = session.paid_at
-          ? new Date(session.paid_at).toLocaleDateString('fr-FR', {
+        const paidDate = session.paidAt
+          ? new Date(session.paidAt).toLocaleDateString('fr-FR', {
               day: '2-digit',
               month: '2-digit',
               year: 'numeric',
@@ -1288,7 +1288,7 @@
           <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${paidDate}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm">
-            <button onclick="showPaidSession('${session.session_uuid}')" class="text-blue-600 hover:text-blue-900">
+            <button onclick="showPaidSession('${session.sessionUuid}')" class="text-blue-600 hover:text-blue-900">
               Voir détails
             </button>
           </td>
@@ -1357,8 +1357,8 @@
           const amountEuros = session.amount ? (session.amount / 100).toFixed(2) + ' €' : '-';
           document.getElementById('paidModalAmount').textContent = amountEuros;
 
-          const paidDate = session.paid_at
-            ? new Date(session.paid_at).toLocaleString('fr-FR')
+          const paidDate = session.paidAt
+            ? new Date(session.paidAt).toLocaleString('fr-FR')
             : 'Non payé';
           document.getElementById('paidModalDate').textContent = paidDate;
 
