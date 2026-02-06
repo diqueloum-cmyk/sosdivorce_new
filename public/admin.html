@@ -1186,9 +1186,9 @@
           // Formater les revenus en euros
           const revenueEuros = (stats.totalRevenue / 100).toFixed(2);
           document.getElementById('totalRevenue').textContent = `${revenueEuros} €`;
-          document.getElementById('totalPaidSessions').textContent = stats.totalPaid || 0;
-          document.getElementById('expressCount').textContent = stats.byExpertise?.classique || 0;
-          document.getElementById('premiumCount').textContent = stats.byExpertise?.premium || 0;
+          document.getElementById('totalPaidSessions').textContent = stats.paidSessions || 0;
+          document.getElementById('expressCount').textContent = stats.classiqueCount || 0;
+          document.getElementById('premiumCount').textContent = stats.premiumCount || 0;
         }
       } catch (error) {
         showError('Erreur chargement statistiques paiements: ' + error.message);
