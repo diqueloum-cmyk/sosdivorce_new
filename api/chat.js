@@ -6,7 +6,9 @@ import {
   getUnpaidSession,
   updateUnpaidSessionEmail,
   moveSessionToUnpaid,
-  addUnpaidMessage
+  addUnpaidMessage,
+  markPaidSessionFirstMessage,
+  markUnpaidSessionFirstMessage
 } from '../lib/db.js';
 import {
   chatRateLimiter,
@@ -269,6 +271,9 @@ export default async function handler(req, res) {
       const unpaidSession = await getUnpaidSession(sessionId);
 
       if (unpaidSession) {
+        // Marquer le premier message utilisateur (incrémente les statistiques)
+        await markUnpaidSessionFirstMessage(sessionId);
+
         // Sauvegarder dans unpaid_messages
         await addUnpaidMessage(unpaidSession.id, 'user', message);
         await addUnpaidMessage(unpaidSession.id, 'assistant', answer);
@@ -278,6 +283,9 @@ export default async function handler(req, res) {
           responseTimeMs
         });
       } else {
+        // Marquer le premier message utilisateur (incrémente les statistiques)
+        await markPaidSessionFirstMessage(sessionId);
+
         // Sauvegarder dans paid_messages (comportement par défaut)
         await addPaidMessage(session.id, 'user', message);
         await addPaidMessage(session.id, 'assistant', answer);

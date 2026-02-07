@@ -10,7 +10,8 @@ import {
   migrateConversationTablesForAnonymous,
   createPaidSessionsTables,
   createUnpaidSessionsTable,
-  createUnpaidMessagesTable
+  createUnpaidMessagesTable,
+  createSessionStatisticsTable
 } from '../lib/db.js';
 import logger from '../lib/logger.js';
 
@@ -105,6 +106,10 @@ export default async function handler(req, res) {
     const unpaidMessagesResult = await createUnpaidMessagesTable();
     logger.info('Table unpaid_messages créée');
 
+    // Créer la table de statistiques
+    const statisticsResult = await createSessionStatisticsTable();
+    logger.info('Table session_statistics créée');
+
     logger.info('Base de données initialisée avec succès');
 
     return res.status(200).json({
@@ -116,7 +121,8 @@ export default async function handler(req, res) {
         conversations: conversationResult,
         paidSessions: paidSessionsResult,
         unpaidSessions: unpaidSessionsResult,
-        unpaidMessages: unpaidMessagesResult
+        unpaidMessages: unpaidMessagesResult,
+        statistics: statisticsResult
       },
       timestamp: new Date().toISOString(),
       info: {

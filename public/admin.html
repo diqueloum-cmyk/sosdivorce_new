@@ -76,7 +76,7 @@
         <!-- Contenu Onglet Statistiques -->
         <div id="contentStats" class="tab-content">
 
-      <!-- Statistiques -->
+      <!-- Statistiques Utilisateurs -->
       <div class="grid md:grid-cols-3 gap-6 mb-8">
         <div class="bg-blue-50 p-4 rounded-lg">
           <h3 class="text-lg font-semibold text-blue-900">Total Utilisateurs</h3>
@@ -89,6 +89,86 @@
         <div class="bg-purple-50 p-4 rounded-lg">
           <h3 class="text-lg font-semibold text-purple-900">Dernier Utilisateur</h3>
           <p id="lastUser" class="text-sm text-purple-600">-</p>
+        </div>
+      </div>
+
+      <!-- Statistiques de Conversion -->
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Tunnel de Conversion</h2>
+
+        <!-- Statistiques Globales -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Statistiques Globales (Tous les temps)</h3>
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white p-4 rounded-lg shadow">
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Premiers Messages</h4>
+              <p id="globalFirstMessages" class="text-3xl font-bold text-blue-600">-</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Emails Collectés</h4>
+              <p id="globalEmailsCollected" class="text-3xl font-bold text-green-600">-</p>
+              <p id="globalEmailRate" class="text-xs text-gray-500 mt-1">-</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Paiements Complétés</h4>
+              <p id="globalPaymentsCompleted" class="text-3xl font-bold text-purple-600">-</p>
+              <p id="globalPaymentRate" class="text-xs text-gray-500 mt-1">-</p>
+            </div>
+          </div>
+          <div class="mt-4 bg-white p-4 rounded-lg shadow">
+            <h4 class="text-sm font-medium text-gray-600 mb-1">Taux de Conversion Global (Message → Paiement)</h4>
+            <p id="globalTotalConversion" class="text-4xl font-bold text-indigo-600">-</p>
+          </div>
+        </div>
+
+        <!-- Statistiques 7 derniers jours -->
+        <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">7 Derniers Jours</h3>
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white p-4 rounded-lg shadow">
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Premiers Messages</h4>
+              <p id="last7DaysFirstMessages" class="text-3xl font-bold text-blue-600">-</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Emails Collectés</h4>
+              <p id="last7DaysEmailsCollected" class="text-3xl font-bold text-green-600">-</p>
+              <p id="last7DaysEmailRate" class="text-xs text-gray-500 mt-1">-</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Paiements Complétés</h4>
+              <p id="last7DaysPaymentsCompleted" class="text-3xl font-bold text-purple-600">-</p>
+              <p id="last7DaysPaymentRate" class="text-xs text-gray-500 mt-1">-</p>
+            </div>
+          </div>
+          <div class="mt-4 bg-white p-4 rounded-lg shadow">
+            <h4 class="text-sm font-medium text-gray-600 mb-1">Taux de Conversion 7j (Message → Paiement)</h4>
+            <p id="last7DaysTotalConversion" class="text-4xl font-bold text-indigo-600">-</p>
+          </div>
+        </div>
+
+        <!-- Graphique par jour (tableau simple) -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Détails par Jour (30 derniers jours)</h3>
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Date</th>
+                  <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">1ers Messages</th>
+                  <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">Emails</th>
+                  <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">Paiements</th>
+                  <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">Taux Email</th>
+                  <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">Taux Paiement</th>
+                  <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">Conversion Totale</th>
+                </tr>
+              </thead>
+              <tbody id="dailyStatsTable">
+                <tr>
+                  <td colspan="7" class="px-4 py-8 text-center text-gray-500">Chargement...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -500,8 +580,71 @@
         } else {
           throw new Error(data.error || 'Erreur lors du chargement des statistiques');
         }
+
+        // Charger aussi les statistiques de conversion
+        await loadConversionStats();
+
       } catch (error) {
         showError('Erreur: ' + error.message);
+      }
+    }
+
+    async function loadConversionStats() {
+      if (!adminKey) return;
+
+      try {
+        const response = await fetch('/api/admin-statistics?days=30', {
+          method: 'GET',
+          headers: {
+            'X-Admin-Password': process.env.ADMIN_PASSWORD || adminKey
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.status === 401) {
+          console.error('Non autorisé pour les statistiques de conversion');
+          return;
+        }
+
+        if (data.success) {
+          // Statistiques globales
+          document.getElementById('globalFirstMessages').textContent = data.global.total_first_messages.toLocaleString();
+          document.getElementById('globalEmailsCollected').textContent = data.global.total_emails_collected.toLocaleString();
+          document.getElementById('globalPaymentsCompleted').textContent = data.global.total_payments_completed.toLocaleString();
+          document.getElementById('globalEmailRate').textContent = `${data.global.email_conversion_rate}% des messages`;
+          document.getElementById('globalPaymentRate').textContent = `${data.global.payment_conversion_rate}% des emails`;
+          document.getElementById('globalTotalConversion').textContent = `${data.global.total_conversion_rate}%`;
+
+          // Statistiques 7 derniers jours
+          document.getElementById('last7DaysFirstMessages').textContent = data.last7Days.first_messages.toLocaleString();
+          document.getElementById('last7DaysEmailsCollected').textContent = data.last7Days.emails_collected.toLocaleString();
+          document.getElementById('last7DaysPaymentsCompleted').textContent = data.last7Days.payments_completed.toLocaleString();
+          document.getElementById('last7DaysEmailRate').textContent = `${data.last7Days.email_conversion_rate}% des messages`;
+          document.getElementById('last7DaysPaymentRate').textContent = `${data.last7Days.payment_conversion_rate}% des emails`;
+          document.getElementById('last7DaysTotalConversion').textContent = `${data.last7Days.total_conversion_rate}%`;
+
+          // Tableau des statistiques journalières
+          const tableBody = document.getElementById('dailyStatsTable');
+          if (data.daily && data.daily.length > 0) {
+            tableBody.innerHTML = data.daily.map(day => `
+              <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-2 text-sm">${new Date(day.date).toLocaleDateString('fr-FR')}</td>
+                <td class="px-4 py-2 text-sm text-right">${day.first_messages}</td>
+                <td class="px-4 py-2 text-sm text-right">${day.emails_collected}</td>
+                <td class="px-4 py-2 text-sm text-right">${day.payments_completed}</td>
+                <td class="px-4 py-2 text-sm text-right ${day.email_conversion_rate > 50 ? 'text-green-600 font-semibold' : ''}">${day.email_conversion_rate}%</td>
+                <td class="px-4 py-2 text-sm text-right ${day.payment_conversion_rate > 30 ? 'text-green-600 font-semibold' : ''}">${day.payment_conversion_rate}%</td>
+                <td class="px-4 py-2 text-sm text-right ${day.total_conversion_rate > 10 ? 'text-green-600 font-semibold' : ''}">${day.total_conversion_rate}%</td>
+              </tr>
+            `).join('');
+          } else {
+            tableBody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Aucune donnée disponible</td></tr>';
+          }
+        }
+      } catch (error) {
+        console.error('Erreur chargement statistiques de conversion:', error);
+        document.getElementById('dailyStatsTable').innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Erreur de chargement</td></tr>';
       }
     }
 
