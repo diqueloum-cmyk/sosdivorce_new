@@ -20,11 +20,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Vérifier l'authentification admin (ADMIN_PASSWORD ou SETUP_KEY)
+    // Vérifier l'authentification admin (ADMIN_KEY, ADMIN_PASSWORD ou SETUP_KEY)
     const adminPassword = req.headers['x-admin-password'];
     const validPasswords = [
-      process.env.ADMIN_PASSWORD,
-      process.env.SETUP_KEY
+      process.env.ADMIN_KEY,      // Clé utilisée par l'interface admin
+      process.env.ADMIN_PASSWORD, // Mot de passe admin alternatif
+      process.env.SETUP_KEY       // Clé de setup comme fallback
     ].filter(Boolean);
 
     if (!validPasswords.includes(adminPassword)) {

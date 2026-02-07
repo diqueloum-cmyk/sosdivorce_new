@@ -590,9 +590,13 @@
     }
 
     async function loadConversionStats() {
-      if (!adminKey) return;
+      if (!adminKey) {
+        console.log('Pas de clé admin, impossible de charger les stats');
+        return;
+      }
 
       try {
+        console.log('Chargement des statistiques de conversion...');
         const response = await fetch('/api/admin-statistics?days=30', {
           method: 'GET',
           headers: {
@@ -600,10 +604,19 @@
           }
         });
 
+        console.log('Réponse reçue:', response.status);
         const data = await response.json();
+        console.log('Données:', data);
 
         if (response.status === 401) {
           console.error('Non autorisé pour les statistiques de conversion');
+          document.getElementById('dailyStatsTable').innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-orange-500">Non autorisé - Vérifiez votre clé admin</td></tr>';
+          return;
+        }
+
+        if (!data.success) {
+          console.error('Erreur API:', data.error);
+          document.getElementById('dailyStatsTable').innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Erreur: ${data.error || 'Erreur inconnue'}</td></tr>`;
           return;
         }
 
