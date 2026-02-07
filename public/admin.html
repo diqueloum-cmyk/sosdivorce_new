@@ -596,7 +596,7 @@
         const response = await fetch('/api/admin-statistics?days=30', {
           method: 'GET',
           headers: {
-            'X-Admin-Password': process.env.ADMIN_PASSWORD || adminKey
+            'X-Admin-Password': adminKey
           }
         });
 
