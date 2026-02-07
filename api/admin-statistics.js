@@ -20,9 +20,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Vérifier l'authentification admin (à personnaliser selon votre système)
+    // Vérifier l'authentification admin (ADMIN_PASSWORD ou SETUP_KEY)
     const adminPassword = req.headers['x-admin-password'];
-    if (adminPassword !== process.env.ADMIN_PASSWORD) {
+    const validPasswords = [
+      process.env.ADMIN_PASSWORD,
+      process.env.SETUP_KEY
+    ].filter(Boolean);
+
+    if (!validPasswords.includes(adminPassword)) {
       logger.security('Tentative accès admin-statistics non autorisée');
       return res.status(401).json({ error: 'Non autorisé' });
     }
