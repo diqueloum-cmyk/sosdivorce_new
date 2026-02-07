@@ -513,42 +513,11 @@
       if (!adminKey) return;
 
       try {
-        const response = await fetch('/api/signup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Admin-Key': adminKey
-          },
-          body: JSON.stringify({ action: 'stats', adminKey: adminKey })
-        });
-
-        const data = await response.json();
-
-        if (response.status === 403) {
-          // Session expirée, demander reconnexion
-          logout();
-          throw new Error('Session expirée. Veuillez vous reconnecter.');
-        }
-
-        if (data.success) {
-          document.getElementById('totalUsers').textContent = data.stats.totalUsers;
-          document.getElementById('todayUsers').textContent = data.stats.todayUsers;
-
-          if (data.stats.lastUser) {
-            document.getElementById('lastUser').textContent =
-              `${data.stats.lastUser.firstName} ${data.stats.lastUser.lastName} (${data.stats.lastUser.email})`;
-          } else {
-            document.getElementById('lastUser').textContent = 'Aucun utilisateur';
-          }
-        } else {
-          throw new Error(data.error || 'Erreur lors du chargement des statistiques');
-        }
-
-        // Charger aussi les statistiques de conversion
+        // Charger uniquement les statistiques de conversion
         await loadConversionStats();
 
       } catch (error) {
-        showError('Erreur: ' + error.message);
+        console.error('Erreur loadStats:', error);
       }
     }
 
@@ -708,13 +677,9 @@
     }
 
     function showError(message) {
-      const errorDiv = document.getElementById('errorMessage');
-      errorDiv.textContent = message;
-      errorDiv.classList.remove('hidden');
-
-      setTimeout(() => {
-        errorDiv.classList.add('hidden');
-      }, 5000);
+      // Afficher l'erreur dans la console au lieu d'un élément HTML supprimé
+      console.error('Erreur admin:', message);
+      alert(message); // Afficher aussi une alerte pour l'utilisateur
     }
 
     // Gestion des onglets principaux
