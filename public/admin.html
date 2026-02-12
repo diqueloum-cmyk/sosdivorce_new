@@ -1502,8 +1502,8 @@
           source: 'unpaid'
         }));
 
-        // Fusionner et trier par date decroissante
-        allConversations = [...paidSessions, ...unpaidSessions].sort((a, b) => {
+        // Fusionner, exclure les sessions sans messages, et trier par date decroissante
+        allConversations = [...paidSessions, ...unpaidSessions].filter(c => c.messageCount > 0).sort((a, b) => {
           return new Date(b.date || 0) - new Date(a.date || 0);
         });
 
