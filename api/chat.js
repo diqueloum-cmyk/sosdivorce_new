@@ -267,12 +267,17 @@ export default async function handler(req, res) {
     // SAUVEGARDER LES MESSAGES EN BASE
     // ====================================
     try {
+      // Ne pas compter [INIT] comme un premier message utilisateur
+      const isRealUserMessage = message.trim() !== '[INIT]';
+
       // Vérifier si la session est dans unpaid_sessions
       const unpaidSession = await getUnpaidSession(sessionId);
 
       if (unpaidSession) {
-        // Marquer le premier message utilisateur (incrémente les statistiques)
-        await markUnpaidSessionFirstMessage(sessionId);
+        // Marquer le premier vrai message utilisateur (incrémente les statistiques)
+        if (isRealUserMessage) {
+          await markUnpaidSessionFirstMessage(sessionId);
+        }
 
         // Sauvegarder dans unpaid_messages
         await addUnpaidMessage(unpaidSession.id, 'user', message);
@@ -283,8 +288,10 @@ export default async function handler(req, res) {
           responseTimeMs
         });
       } else {
-        // Marquer le premier message utilisateur (incrémente les statistiques)
-        await markPaidSessionFirstMessage(sessionId);
+        // Marquer le premier vrai message utilisateur (incrémente les statistiques)
+        if (isRealUserMessage) {
+          await markPaidSessionFirstMessage(sessionId);
+        }
 
         // Sauvegarder dans paid_messages (comportement par défaut)
         await addPaidMessage(session.id, 'user', message);
