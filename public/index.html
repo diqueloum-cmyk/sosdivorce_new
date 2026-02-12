@@ -698,9 +698,11 @@
 
       if (!message) return;
 
-      // Marquer comme en cours
+      // Marquer comme en cours et desactiver l'input
       state.isProcessing = true;
       setButtonLoading(true);
+      userInput.disabled = true;
+      document.getElementById('sendButton').disabled = true;
 
       // Afficher le message utilisateur
       addMessage(message, 'user');
@@ -743,6 +745,9 @@
       } finally {
         state.isProcessing = false;
         setButtonLoading(false);
+        userInput.disabled = false;
+        document.getElementById('sendButton').disabled = false;
+        userInput.focus();
       }
     }
 
