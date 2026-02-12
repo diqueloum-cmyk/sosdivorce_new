@@ -88,22 +88,22 @@
           <h3 class="text-lg font-semibold text-gray-800 mb-4">Statistiques Globales (Tous les temps)</h3>
           <div class="grid md:grid-cols-3 gap-6">
             <div class="bg-white p-4 rounded-lg shadow">
-              <h4 class="text-sm font-medium text-gray-600 mb-1">Premiers Messages</h4>
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Premieres Reponses</h4>
               <p id="globalFirstMessages" class="text-3xl font-bold text-blue-600">-</p>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
-              <h4 class="text-sm font-medium text-gray-600 mb-1">Emails Collectés</h4>
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Emails Collectes</h4>
               <p id="globalEmailsCollected" class="text-3xl font-bold text-green-600">-</p>
               <p id="globalEmailRate" class="text-xs text-gray-500 mt-1">-</p>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
-              <h4 class="text-sm font-medium text-gray-600 mb-1">Paiements Complétés</h4>
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Paiements Completes</h4>
               <p id="globalPaymentsCompleted" class="text-3xl font-bold text-purple-600">-</p>
               <p id="globalPaymentRate" class="text-xs text-gray-500 mt-1">-</p>
             </div>
           </div>
           <div class="mt-4 bg-white p-4 rounded-lg shadow">
-            <h4 class="text-sm font-medium text-gray-600 mb-1">Taux de Conversion Global (Message → Paiement)</h4>
+            <h4 class="text-sm font-medium text-gray-600 mb-1">Taux de Conversion Global (Reponse → Paiement)</h4>
             <p id="globalTotalConversion" class="text-4xl font-bold text-indigo-600">-</p>
           </div>
         </div>
@@ -113,22 +113,22 @@
           <h3 class="text-lg font-semibold text-gray-800 mb-4">7 Derniers Jours</h3>
           <div class="grid md:grid-cols-3 gap-6">
             <div class="bg-white p-4 rounded-lg shadow">
-              <h4 class="text-sm font-medium text-gray-600 mb-1">Premiers Messages</h4>
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Premieres Reponses</h4>
               <p id="last7DaysFirstMessages" class="text-3xl font-bold text-blue-600">-</p>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
-              <h4 class="text-sm font-medium text-gray-600 mb-1">Emails Collectés</h4>
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Emails Collectes</h4>
               <p id="last7DaysEmailsCollected" class="text-3xl font-bold text-green-600">-</p>
               <p id="last7DaysEmailRate" class="text-xs text-gray-500 mt-1">-</p>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
-              <h4 class="text-sm font-medium text-gray-600 mb-1">Paiements Complétés</h4>
+              <h4 class="text-sm font-medium text-gray-600 mb-1">Paiements Completes</h4>
               <p id="last7DaysPaymentsCompleted" class="text-3xl font-bold text-purple-600">-</p>
               <p id="last7DaysPaymentRate" class="text-xs text-gray-500 mt-1">-</p>
             </div>
           </div>
           <div class="mt-4 bg-white p-4 rounded-lg shadow">
-            <h4 class="text-sm font-medium text-gray-600 mb-1">Taux de Conversion 7j (Message → Paiement)</h4>
+            <h4 class="text-sm font-medium text-gray-600 mb-1">Taux de Conversion 7j (Reponse → Paiement)</h4>
             <p id="last7DaysTotalConversion" class="text-4xl font-bold text-indigo-600">-</p>
           </div>
         </div>
@@ -141,7 +141,7 @@
               <thead class="bg-gray-100">
                 <tr>
                   <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Date</th>
-                  <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">1ers Messages</th>
+                  <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">1eres Reponses</th>
                   <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">Emails</th>
                   <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">Paiements</th>
                   <th class="px-4 py-2 text-right text-sm font-semibold text-gray-700">Taux Email</th>
@@ -201,7 +201,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Formule</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Messages</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reponses</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
@@ -242,8 +242,8 @@
                   </div>
                 </div>
 
-                <!-- Messages -->
-                <h3 class="text-lg font-semibold mb-4">Messages</h3>
+                <!-- Reponses -->
+                <h3 class="text-lg font-semibold mb-4">Reponses</h3>
                 <div id="convModalMessages" class="space-y-4 max-h-96 overflow-y-auto">
                 </div>
 
@@ -416,7 +416,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Formule</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date collecte</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Messages</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reponses</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tentatives</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
@@ -656,7 +656,7 @@
           document.getElementById('globalFirstMessages').textContent = data.global.total_first_messages.toLocaleString();
           document.getElementById('globalEmailsCollected').textContent = data.global.total_emails_collected.toLocaleString();
           document.getElementById('globalPaymentsCompleted').textContent = data.global.total_payments_completed.toLocaleString();
-          document.getElementById('globalEmailRate').textContent = `${data.global.email_conversion_rate}% des messages`;
+          document.getElementById('globalEmailRate').textContent = `${data.global.email_conversion_rate}% des reponses`;
           document.getElementById('globalPaymentRate').textContent = `${data.global.payment_conversion_rate}% des emails`;
           document.getElementById('globalTotalConversion').textContent = `${data.global.total_conversion_rate}%`;
 
@@ -664,7 +664,7 @@
           document.getElementById('last7DaysFirstMessages').textContent = data.last7Days.first_messages.toLocaleString();
           document.getElementById('last7DaysEmailsCollected').textContent = data.last7Days.emails_collected.toLocaleString();
           document.getElementById('last7DaysPaymentsCompleted').textContent = data.last7Days.payments_completed.toLocaleString();
-          document.getElementById('last7DaysEmailRate').textContent = `${data.last7Days.email_conversion_rate}% des messages`;
+          document.getElementById('last7DaysEmailRate').textContent = `${data.last7Days.email_conversion_rate}% des reponses`;
           document.getElementById('last7DaysPaymentRate').textContent = `${data.last7Days.payment_conversion_rate}% des emails`;
           document.getElementById('last7DaysTotalConversion').textContent = `${data.last7Days.total_conversion_rate}%`;
 
@@ -1029,7 +1029,7 @@
           messagesContainer.innerHTML = '';
 
           if (messages.length === 0) {
-            messagesContainer.innerHTML = '<p class="text-gray-500">Aucun message dans cette conversation</p>';
+            messagesContainer.innerHTML = '<p class="text-gray-500">Aucune reponse dans cette conversation</p>';
           } else {
             messages.forEach(msg => {
               const msgDiv = document.createElement('div');
@@ -1394,7 +1394,7 @@
           messagesContainer.innerHTML = '';
 
           if (messages.length === 0) {
-            messagesContainer.innerHTML = '<p class="text-gray-500">Aucun message dans cette conversation</p>';
+            messagesContainer.innerHTML = '<p class="text-gray-500">Aucune reponse dans cette conversation</p>';
           } else {
             messages.forEach(msg => {
               const msgDiv = document.createElement('div');
@@ -1639,7 +1639,7 @@
           messagesContainer.innerHTML = '';
 
           if (messages.length === 0) {
-            messagesContainer.innerHTML = '<p class="text-gray-500">Aucun message dans cette conversation</p>';
+            messagesContainer.innerHTML = '<p class="text-gray-500">Aucune reponse dans cette conversation</p>';
           } else {
             messages.forEach(msg => {
               const msgDiv = document.createElement('div');
