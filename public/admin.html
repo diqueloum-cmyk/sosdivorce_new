@@ -64,6 +64,9 @@
             <button id="tabStats" class="tab-button active px-6 py-3 font-semibold text-blue-900 border-b-2 border-blue-900">
               Statistiques
             </button>
+            <button id="tabConversations" class="tab-button px-6 py-3 font-semibold text-gray-600 hover:text-blue-900">
+              Conversations
+            </button>
             <button id="tabPayments" class="tab-button px-6 py-3 font-semibold text-gray-600 hover:text-blue-900">
               Paiements
             </button>
@@ -158,6 +161,102 @@
 
         </div>
         <!-- Fin Contenu Onglet Statistiques -->
+
+        <!-- Contenu Onglet Conversations -->
+        <div id="contentConversations" class="tab-content hidden">
+          <!-- Stats rapides -->
+          <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-indigo-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-indigo-900">Total Conversations</h3>
+              <p id="convTotalCount" class="text-2xl font-bold text-indigo-600">-</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-green-900">Sessions Payees</h3>
+              <p id="convPaidCount" class="text-2xl font-bold text-green-600">-</p>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-yellow-900">Sessions Non Payees</h3>
+              <p id="convUnpaidCount" class="text-2xl font-bold text-yellow-600">-</p>
+            </div>
+          </div>
+
+          <!-- Filtres -->
+          <div class="mb-6 flex gap-4 items-center">
+            <button onclick="loadAllConversations()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              Actualiser
+            </button>
+            <select id="convTypeFilter" onchange="filterConversations()" class="border rounded px-3 py-2 text-gray-700">
+              <option value="all">Toutes les conversations</option>
+              <option value="paid">Sessions payees uniquement</option>
+              <option value="unpaid">Sessions non payees uniquement</option>
+            </select>
+          </div>
+
+          <!-- Tableau des conversations -->
+          <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Formule</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Messages</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="conversationsList" class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td colspan="6" class="px-6 py-8 text-center text-gray-500">Chargement...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Modal Conversation -->
+          <div id="conversationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto">
+            <div class="flex justify-center min-h-screen p-4">
+              <div class="bg-white rounded-lg max-w-4xl w-full my-auto p-8">
+                <div class="flex justify-between items-center mb-6">
+                  <h2 id="convModalTitle" class="text-2xl font-bold text-blue-900">Conversation</h2>
+                  <button onclick="closeConversationModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+
+                <!-- Infos session -->
+                <div class="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-lg">
+                  <div>
+                    <p class="text-sm text-gray-500">Email</p>
+                    <p id="convModalEmail" class="font-semibold">-</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Type</p>
+                    <p id="convModalType" class="font-semibold">-</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Formule</p>
+                    <p id="convModalExpertise" class="font-semibold">-</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Date</p>
+                    <p id="convModalDate" class="font-semibold">-</p>
+                  </div>
+                </div>
+
+                <!-- Messages -->
+                <h3 class="text-lg font-semibold mb-4">Messages</h3>
+                <div id="convModalMessages" class="space-y-4 max-h-96 overflow-y-auto">
+                </div>
+
+                <div class="mt-6">
+                  <button onclick="closeConversationModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                    Fermer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Fin Contenu Onglet Conversations -->
 
         <!-- Contenu Onglet Paiements -->
         <div id="contentPayments" class="tab-content hidden">
@@ -685,6 +784,11 @@
     // Gestion des onglets principaux
     document.getElementById('tabStats').addEventListener('click', () => {
       switchTab('Stats');
+    });
+
+    document.getElementById('tabConversations').addEventListener('click', () => {
+      switchTab('Conversations');
+      loadAllConversations();
     });
 
     document.getElementById('tabPayments').addEventListener('click', () => {
@@ -1339,6 +1443,239 @@
     function exportUnpaidSessions() {
       if (!adminKey) return;
       window.location.href = `/api/admin-unpaid-sessions?action=export&adminKey=${adminKey}`;
+    }
+
+    // ====================================
+    // FONCTIONS ONGLET CONVERSATIONS
+    // ====================================
+
+    let allConversations = [];
+
+    /**
+     * Charger toutes les conversations (paid + unpaid)
+     */
+    async function loadAllConversations() {
+      if (!adminKey) return;
+
+      const tbody = document.getElementById('conversationsList');
+      tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Chargement...</td></tr>';
+
+      try {
+        // Charger les deux sources en parallele
+        const [paidRes, unpaidRes] = await Promise.all([
+          fetch('/api/admin-payments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+            body: JSON.stringify({ action: 'list', adminKey, page: 1, limit: 500, paidOnly: false })
+          }),
+          fetch('/api/admin-unpaid-sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+            body: JSON.stringify({ action: 'list', limit: 500, offset: 0 })
+          })
+        ]);
+
+        const paidData = await paidRes.json();
+        const unpaidData = await unpaidRes.json();
+
+        const paidSessions = (paidData.success ? paidData.sessions || [] : []).map(s => ({
+          id: s.id,
+          sessionUuid: s.sessionUuid,
+          email: s.email || 'Non renseigne',
+          type: s.paid ? 'paid' : 'paid_pending',
+          typeLabel: s.paid ? 'Payee' : 'En attente paiement',
+          expertise: s.expertise,
+          messageCount: s.messageCount || 0,
+          date: s.paidAt || s.createdAt,
+          source: 'paid'
+        }));
+
+        const unpaidSessions = (unpaidData.success ? unpaidData.sessions || [] : []).map(s => ({
+          id: s.id,
+          sessionUuid: s.session_uuid,
+          email: s.email || 'Non renseigne',
+          type: 'unpaid',
+          typeLabel: 'Non payee',
+          expertise: s.expertise,
+          messageCount: s.messageCount || 0,
+          date: s.email_collected_at || s.created_at,
+          source: 'unpaid'
+        }));
+
+        // Fusionner et trier par date decroissante
+        allConversations = [...paidSessions, ...unpaidSessions].sort((a, b) => {
+          return new Date(b.date || 0) - new Date(a.date || 0);
+        });
+
+        // Mettre a jour les compteurs
+        const paidCount = paidSessions.filter(s => s.type === 'paid').length;
+        const unpaidCount = unpaidSessions.length;
+        document.getElementById('convTotalCount').textContent = allConversations.length;
+        document.getElementById('convPaidCount').textContent = paidCount;
+        document.getElementById('convUnpaidCount').textContent = unpaidCount;
+
+        filterConversations();
+      } catch (error) {
+        console.error('Erreur chargement conversations:', error);
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Erreur de chargement</td></tr>';
+      }
+    }
+
+    /**
+     * Filtrer et afficher les conversations
+     */
+    function filterConversations() {
+      const filter = document.getElementById('convTypeFilter').value;
+      let filtered = allConversations;
+
+      if (filter === 'paid') {
+        filtered = allConversations.filter(c => c.source === 'paid');
+      } else if (filter === 'unpaid') {
+        filtered = allConversations.filter(c => c.source === 'unpaid');
+      }
+
+      renderConversations(filtered);
+    }
+
+    /**
+     * Afficher les conversations dans le tableau
+     */
+    function renderConversations(conversations) {
+      const tbody = document.getElementById('conversationsList');
+      tbody.innerHTML = '';
+
+      if (conversations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Aucune conversation trouvee</td></tr>';
+        return;
+      }
+
+      conversations.forEach(conv => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50';
+
+        const dateStr = conv.date
+          ? new Date(conv.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : '-';
+
+        let typeBadge = '';
+        if (conv.type === 'paid') {
+          typeBadge = '<span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Payee</span>';
+        } else if (conv.type === 'paid_pending') {
+          typeBadge = '<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">En attente</span>';
+        } else {
+          typeBadge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">Non payee</span>';
+        }
+
+        let expertiseBadge = '-';
+        if (conv.expertise === 'classique') {
+          expertiseBadge = '<span class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">Express</span>';
+        } else if (conv.expertise === 'premium') {
+          expertiseBadge = '<span class="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs">Premium</span>';
+        }
+
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${dateStr}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${conv.email}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">${typeBadge}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">${expertiseBadge}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${conv.messageCount}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <button onclick="showConversationDetail('${conv.sessionUuid}', '${conv.source}')" class="text-blue-600 hover:text-blue-900">
+              Voir conversation
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    /**
+     * Afficher le detail d'une conversation
+     */
+    async function showConversationDetail(sessionUuid, source) {
+      if (!adminKey) return;
+
+      try {
+        let response;
+        if (source === 'paid') {
+          response = await fetch('/api/admin-payments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+            body: JSON.stringify({ action: 'messages', adminKey, sessionId: sessionUuid })
+          });
+        } else {
+          response = await fetch('/api/admin-unpaid-sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+            body: JSON.stringify({ action: 'messages', sessionId: sessionUuid })
+          });
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          const session = data.session;
+          const messages = data.messages || [];
+
+          document.getElementById('convModalEmail').textContent = session.email || 'Non renseigne';
+          document.getElementById('convModalType').textContent = source === 'paid'
+            ? (session.paid ? 'Session payee' : 'En attente de paiement')
+            : 'Session non payee';
+
+          let expertiseText = 'Non selectionne';
+          if (session.expertise === 'classique') expertiseText = 'Analyse Express (29 EUR)';
+          else if (session.expertise === 'premium') expertiseText = 'Analyse Premium (49 EUR)';
+          document.getElementById('convModalExpertise').textContent = expertiseText;
+
+          const dateStr = (source === 'paid' ? session.paidAt : session.email_collected_at)
+            || session.createdAt || session.created_at;
+          document.getElementById('convModalDate').textContent = dateStr
+            ? new Date(dateStr).toLocaleString('fr-FR')
+            : '-';
+
+          // Afficher les messages
+          const messagesContainer = document.getElementById('convModalMessages');
+          messagesContainer.innerHTML = '';
+
+          if (messages.length === 0) {
+            messagesContainer.innerHTML = '<p class="text-gray-500">Aucun message dans cette conversation</p>';
+          } else {
+            messages.forEach(msg => {
+              const msgDiv = document.createElement('div');
+              msgDiv.className = msg.role === 'user' ? 'bg-blue-50 p-4 rounded-lg' : 'bg-gray-50 p-4 rounded-lg';
+
+              const roleDiv = document.createElement('div');
+              roleDiv.className = `font-bold text-sm mb-2 ${msg.role === 'user' ? 'text-blue-900' : 'text-gray-700'}`;
+              roleDiv.textContent = msg.role === 'user' ? 'Utilisateur' : 'Assistant';
+
+              const contentDiv = document.createElement('div');
+              contentDiv.className = 'text-gray-800 whitespace-pre-wrap';
+              contentDiv.textContent = msg.content;
+
+              const dateDiv = document.createElement('div');
+              dateDiv.className = 'text-xs text-gray-500 mt-2';
+              dateDiv.textContent = msg.created_at ? new Date(msg.created_at).toLocaleString('fr-FR') : '';
+
+              msgDiv.appendChild(roleDiv);
+              msgDiv.appendChild(contentDiv);
+              msgDiv.appendChild(dateDiv);
+              messagesContainer.appendChild(msgDiv);
+            });
+          }
+
+          document.getElementById('conversationModal').classList.remove('hidden');
+        }
+      } catch (error) {
+        showError('Erreur chargement conversation: ' + error.message);
+      }
+    }
+
+    /**
+     * Fermer le modal conversation
+     */
+    function closeConversationModal() {
+      document.getElementById('conversationModal').classList.add('hidden');
     }
   </script>
 </body>
